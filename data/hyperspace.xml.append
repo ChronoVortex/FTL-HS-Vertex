@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FTL>
+
+<mod:findLike type="scripts">
+    <mod-append:script>data/vertex_module/util.lua</mod-append:script>
+</mod:findLike>
+
+</FTL>
