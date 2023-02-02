@@ -4,6 +4,7 @@
 
 <mod:findLike type="scripts">
     <mod-append:script>data/vertex_module/util.lua</mod-append:script>
+    <mod-append:script>data/vertex_module/xml.lua</mod-append:script>
 </mod:findLike>
 
 </FTL>

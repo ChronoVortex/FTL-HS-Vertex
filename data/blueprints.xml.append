@@ -1,0 +1,68 @@
+<weaponBlueprint name="SHIELD_LASER">
+
+	<augEffects>
+		<augEffect effect="SHIELD_RECHARGE" amount="20" needsPower="true"/>
+	</augEffects>
+
+	<type>LASER</type>
+	<title>Pop</title>
+	<short>Pop</short>
+	<tip>tip_laser</tip>
+	<desc id="weapon_LASER_BURST_1_desc"/>
+	<tooltip id="weapon_LASER_BURST_1_tooltip"/>
+	<damage>1</damage>
+	<shots>5</shots>
+	<sp>0</sp>
+	<fireChance>0</fireChance>
+	<breachChance>0</breachChance>
+	<cooldown>2</cooldown>
+	<power>1</power>
+	<cost>20</cost>
+	<accuracyMod>100</accuracyMod>
+	<bp>2</bp>
+	<rarity>0</rarity>
+	<image>laser_light1</image>
+	<launchSounds>
+		<sound>lightLaser1</sound>
+		<sound>lightLaser2</sound>
+		<sound>lightLaser3</sound>
+	</launchSounds>
+	<hitShipSounds>
+		<sound>hitHull2</sound>
+		<sound>hitHull3</sound>
+	</hitShipSounds>
+	<hitShieldSounds>
+		<sound>hitShield1</sound>
+		<sound>hitShield2</sound>
+		<sound>hitShield3</sound>
+	</hitShieldSounds>
+	<missSounds>
+		<sound>miss</sound>
+	</missSounds>
+	<weaponArt>laser_burst_1</weaponArt>
+	<iconImage>laser</iconImage>
+</weaponBlueprint>
+
+<droneBlueprint name="COOL_DRONE">
+	<type>DEFENSE</type>
+	<level>1</level>
+	<tip>tip_defense</tip>
+	<title>Cooldown Drone</title>
+	<short>Cool Drone</short>
+	<desc>Guns go fast</desc>
+	<power>2</power>
+	<cooldown>2147483647</cooldown> 
+	<dodge>0</dodge>
+	<speed>5</speed>
+	<cost>50</cost>
+	<bp>2</bp>
+	<droneImage>drone_shield</droneImage>
+	<weaponBlueprint>DRONE_LASER</weaponBlueprint>
+	<iconImage>shield</iconImage>
+
+	<augEffects>
+		<augEffect effect="AUTO_COOLDOWN" amount="999" needsPower="true"/>
+	</augEffects>
+
+	<rarity>1</rarity>
+</droneBlueprint>
