@@ -45,7 +45,7 @@ function mods.vertexutil.get_ship_crew_point(shipManager, x, y, maxCount)
 end
 
 -- Returns a table where the indices are the IDs of all rooms adjacent to the given room
-function get_adjacent_rooms(shipId, roomId, diagonals)
+function mods.vertexutil.get_adjacent_rooms(shipId, roomId, diagonals)
     local shipGraph = Hyperspace.ShipGraph.GetShipInfo(shipId)
     local roomShape = shipGraph:GetRoomShape(roomId)
     local adjacentRooms = {}
@@ -104,15 +104,15 @@ local PrintHelper = {
         end
     end,
     
-    AddString=function(self,...)
+    AddString = function(self, ...)
         self.timer = 0
         local string = ""
-        for i = 1, select("#",...) do
-          string = string..tostring(select(i,...)) .. "    "
+        for i = 1, select("#", ...) do
+          string = string..tostring(select(i, ...)) .. "    "
         end
         table.insert(self.queue, string)
         if #self.queue > self.config.messages then
-            table.remove(self.queue,1)
+            table.remove(self.queue, 1)
         end
     end,
 }
@@ -123,12 +123,12 @@ end)
 
 local OldPrint=print
 function print(...)
-  PrintHelper:AddString(...)
-  OldPrint(...)
+    PrintHelper:AddString(...)
+    OldPrint(...)
 end
 
 function printf(...)
-  return print(string.format(...))
+    return print(string.format(...))
 end
 
 -----------------------
