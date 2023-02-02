@@ -12,6 +12,7 @@ function mods.vertexutil.vter(cvec)
         if i < n then return cvec[i] end
     end
 end
+local vter = mods.vertexutil.vter
 
 -- Check if a given crew member is being mind controlled by a ship system
 function mods.vertexutil.under_mind_system(crewmem)
@@ -19,7 +20,7 @@ function mods.vertexutil.under_mind_system(crewmem)
     local otherShipId = (crewmem.iShipId + 1)%2
     pcall(function() controlledCrew = Hyperspace.Global.GetInstance():GetShipManager(otherShipId).mindSystem.controlledCrew end)
     if controlledCrew then
-        for crew in mods.vertexutil.vter(controlledCrew) do
+        for crew in vter(controlledCrew) do
             if crewmem == crew then
                 return true
             end
@@ -27,13 +28,19 @@ function mods.vertexutil.under_mind_system(crewmem)
     end
     return false
 end
+local under_mind_system = mods.vertexutil.under_mind_system
+
+-- Check if a given crew member can be mind controlled
+function mods.vertexutil.can_be_mind_controlled(crewmem)
+    return not (crewmem:IsTelepathic() or crewmem:IsDrone()) and not under_mind_system(crewmem)
+end
 
 -- Returns a table of all crew belonging to the given ship on the room tile at the given point
 function mods.vertexutil.get_ship_crew_point(shipManager, x, y, maxCount)
     res = {}
     x = x//35
     y = y//35
-    for crewmem in mods.vertexutil.vter(shipManager.vCrewList) do
+    for crewmem in vter(shipManager.vCrewList) do
         if crewmem.iShipId == shipManager.iShipId and x == crewmem.x//35 and y == crewmem.y//35 then
             table.insert(res, crewmem)
             if maxCount and #res >= maxCount then
@@ -85,7 +92,7 @@ local PrintHelper = {
         line_length = 250, -- How long a line can be before it is broken
         duration = 5,      -- The number of seconds before something is cleared from the console
         messages = 10,     -- How many messages can be on the console at once
-        use_speed = false,  --if true, uses game speed, if false, uses real time
+        use_speed = false, -- If true, uses game speed, if false, uses real time
     },
     Render = function(self)
         if self.timer <= self.config.duration then
@@ -155,12 +162,12 @@ script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
         local shouldSave = {}
         local crewCheckList = nil
         if pcall(function() crewCheckList = Hyperspace.ships.player.vCrewList end) then
-            for existingCrew in mods.vertexutil.vter(crewCheckList) do
+            for existingCrew in vter(crewCheckList) do
                 shouldSave[Hyperspace.Get_CrewMember_Extend(existingCrew).selfId] = true
             end
         end
         if pcall(function() crewCheckList = Hyperspace.ships.enemy.vCrewList end) then
-            for existingCrew in mods.vertexutil.vter(crewCheckList) do
+            for existingCrew in vter(crewCheckList) do
                 shouldSave[Hyperspace.Get_CrewMember_Extend(existingCrew).selfId] = true
             end
         end

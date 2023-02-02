@@ -1,7 +1,7 @@
-<weaponBlueprint name="SHIELD_LASER">
+<weaponBlueprint name="LASER_COOLDOWN">
 
 	<augEffects>
-		<augEffect effect="SHIELD_RECHARGE" amount="20" needsPower="true"/>
+		<augEffect effect="AUTO_COOLDOWN" amount="0.15" needsPower="true"/>
 	</augEffects>
 
 	<type>LASER</type>
@@ -11,7 +11,7 @@
 	<desc id="weapon_LASER_BURST_1_desc"/>
 	<tooltip id="weapon_LASER_BURST_1_tooltip"/>
 	<damage>1</damage>
-	<shots>5</shots>
+	<shots>1</shots>
 	<sp>0</sp>
 	<fireChance>0</fireChance>
 	<breachChance>0</breachChance>
@@ -43,12 +43,128 @@
 	<iconImage>laser</iconImage>
 </weaponBlueprint>
 
-<droneBlueprint name="COOL_DRONE">
+<weaponBlueprint name="BEAM_MIND">
+
+    <mindControl endSound="mindControlEnd">3</mindControl>
+
+	<type>BEAM</type>
+	<tip>tip_beams</tip>
+	<title>OooOoo</title>
+	<short>OooOoo</short>
+	<desc id="weapon_BEAM_1_desc"/>
+	<tooltip id="weapon_BEAM_1_tooltip"/>
+	<damage>0</damage>
+	<sp>10</sp>
+	<fireChance>0</fireChance>
+	<breachChance>0</breachChance>
+	<cooldown>6</cooldown>
+	<speed>4</speed>
+	<power>1</power>
+	<cost>20</cost>
+	<bp>2</bp>
+	<rarity>0</rarity>
+	<image>beam_contact</image>
+	<length>45</length>
+	<launchSounds>
+		<sound>beam1</sound>
+		<sound>beam1_2</sound>
+	</launchSounds>
+	<weaponArt>beam_1</weaponArt>
+	<iconImage>beam</iconImage>
+</weaponBlueprint>
+
+<weaponBlueprint name="LASER_MIND">
+
+	<mindControl limit="1" endSound="mindControlEnd">3</mindControl>
+
+	<type>LASER</type>
+	<title>OooOoo</title>
+	<short>OooOoo</short>
+	<tip>tip_laser</tip>
+	<desc id="weapon_LASER_BURST_1_desc"/>
+	<tooltip id="weapon_LASER_BURST_1_tooltip"/>
+	<damage>0</damage>
+	<shots>1</shots>
+	<sp>10</sp>
+	<fireChance>0</fireChance>
+	<breachChance>0</breachChance>
+	<cooldown>2</cooldown>
+	<power>1</power>
+	<cost>20</cost>
+	<accuracyMod>100</accuracyMod>
+	<bp>2</bp>
+	<rarity>0</rarity>
+	<image>laser_light1</image>
+	<launchSounds>
+		<sound>lightLaser1</sound>
+		<sound>lightLaser2</sound>
+		<sound>lightLaser3</sound>
+	</launchSounds>
+	<hitShipSounds>
+		<sound>hitHull2</sound>
+		<sound>hitHull3</sound>
+	</hitShipSounds>
+	<hitShieldSounds>
+		<sound>hitShield1</sound>
+		<sound>hitShield2</sound>
+		<sound>hitShield3</sound>
+	</hitShieldSounds>
+	<missSounds>
+		<sound>miss</sound>
+	</missSounds>
+	<weaponArt>laser_burst_1</weaponArt>
+	<iconImage>laser</iconImage>
+</weaponBlueprint>
+
+<weaponBlueprint name="LASER_MIND_ALL">
+
+	<mindControl endSound="mindControlEnd">3</mindControl>
+
+	<type>LASER</type>
+	<title>OooOoo</title>
+	<short>OooOoo</short>
+	<tip>tip_laser</tip>
+	<desc id="weapon_LASER_BURST_1_desc"/>
+	<tooltip id="weapon_LASER_BURST_1_tooltip"/>
+	<damage>0</damage>
+	<shots>1</shots>
+	<sp>10</sp>
+	<fireChance>0</fireChance>
+	<breachChance>0</breachChance>
+	<cooldown>2</cooldown>
+	<power>1</power>
+	<cost>20</cost>
+	<accuracyMod>100</accuracyMod>
+	<bp>2</bp>
+	<rarity>0</rarity>
+	<image>laser_light1</image>
+	<launchSounds>
+		<sound>lightLaser1</sound>
+		<sound>lightLaser2</sound>
+		<sound>lightLaser3</sound>
+	</launchSounds>
+	<hitShipSounds>
+		<sound>hitHull2</sound>
+		<sound>hitHull3</sound>
+	</hitShipSounds>
+	<hitShieldSounds>
+		<sound>hitShield1</sound>
+		<sound>hitShield2</sound>
+		<sound>hitShield3</sound>
+	</hitShieldSounds>
+	<missSounds>
+		<sound>miss</sound>
+	</missSounds>
+	<weaponArt>laser_burst_1</weaponArt>
+	<iconImage>laser</iconImage>
+</weaponBlueprint>
+
+<droneBlueprint name="DRONE_SHIELD_RE">
 	<type>DEFENSE</type>
 	<level>1</level>
 	<tip>tip_defense</tip>
-	<title>Cooldown Drone</title>
-	<short>Cool Drone</short>
+	<title>Shield Drone</title>
+	<short>Shield Drone</short>
 	<desc>Guns go fast</desc>
 	<power>2</power>
 	<cooldown>2147483647</cooldown> 
@@ -61,8 +177,8 @@
 	<iconImage>shield</iconImage>
 
 	<augEffects>
-		<augEffect effect="AUTO_COOLDOWN" amount="999" needsPower="true"/>
+		<augEffect effect="SHIELD_RECHARGE" amount="20" needsPower="true"/>
 	</augEffects>
 
-	<rarity>1</rarity>
+	<rarity>0</rarity>
 </droneBlueprint>
