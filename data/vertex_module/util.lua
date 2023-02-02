@@ -85,6 +85,7 @@ local PrintHelper = {
         line_length = 250, -- How long a line can be before it is broken
         duration = 5,      -- The number of seconds before something is cleared from the console
         messages = 10,     -- How many messages can be on the console at once
+        use_speed = false,  --if true, uses game speed, if false, uses real time
     },
     Render = function(self)
         if self.timer <= self.config.duration then
@@ -95,20 +96,23 @@ local PrintHelper = {
                self.config.line_length,
                table.concat(self.queue, "\n")
            )
-           self.timer = self.timer + (Hyperspace.FPS.SpeedFactor/16) -- Makes the time pass in proportion to game speed, maybe change
+            local increment = self.config.use_speed and (Hyperspace.FPS.SpeedFactor/16) or (1/Hyperspace.FPS.NumFrames)
+            self.timer = self.timer + increment
         else
             self.timer = 0
             table.remove(self.queue, 1)
         end
     end,
     
-    AddString = function(self, string)
-        if self.timer > self.config.duration then
-            self.timer = 0
+    AddString=function(self,...)
+        self.timer = 0
+        local string = ""
+        for i = 1, select("#",...) do
+          string = string..tostring(select(i,...)) .. "    "
         end
-        table.insert(self.queue, tostring(string))
+        table.insert(self.queue, string)
         if #self.queue > self.config.messages then
-            table.remove(self.queue, 1)
+            table.remove(self.queue,1)
         end
     end,
 }
@@ -117,10 +121,14 @@ script.on_render_event(Defines.RenderEvents.MOUSE_CONTROL, function() end, funct
     PrintHelper:Render()
 end)
 
-local old_print = print
-function print(x)
-    PrintHelper:AddString(x)
-    old_print(x)
+local OldPrint=print
+function print(...)
+  PrintHelper:AddString(...)
+  OldPrint(...)
+end
+
+function printf(...)
+  return print(string.format(...))
 end
 
 -----------------------
