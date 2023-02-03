@@ -6,10 +6,8 @@ local can_be_mind_controlled = mods.vertexutil.can_be_mind_controlled
 ----------------
 -- XML LOADER --
 ----------------
-mods.vertexutil.weaponInfo = {}
-mods.vertexutil.droneInfo = {}
-local weaponInfo = mods.vertexutil.weaponInfo
-local droneInfo = mods.vertexutil.droneInfo
+local weaponInfo = {}
+local droneInfo = {}
 
 local blueprintFiles = {
     "data/blueprints.xml",
@@ -31,7 +29,7 @@ do
 end
 
 -- Same boolean parsing as used by hyperspace
-local function ParseBoolean(s)
+local function parse_xml_bool(s)
     return s == "true" or s == "True" or s == "TRUE"
 end
 
@@ -53,7 +51,7 @@ customTagsAll["augEffects"] = function(node) -- Gives a weapon or drone the effe
         if not augEffectNode:first_attribute("needsPower") then 
             augEffect.needsPower = true  -- augEffects need power by default, could change
         else 
-            augEffect.needsPower = ParseBoolean(augEffectNode:first_attribute("needsPower"):value())
+            augEffect.needsPower = parse_xml_bool(augEffectNode:first_attribute("needsPower"):value())
         end
         
         table.insert(augEffects, augEffect)
@@ -154,7 +152,7 @@ end
 -- CUSTOM TAG MANAGEMENT --
 ---------------------------
 -- Apply custom augment effects to weapons and drones
-local get_aug_bonus = function(system, equipmentInfo, augName)
+local function get_aug_bonus(system, equipmentInfo, augName)
     local augBonusValue = 0
     if system then
         for equipment in vter(system) do
@@ -218,22 +216,24 @@ end)
 
 -- Handle other mind control weapons
 script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA, function(shipManager, projectile, location, damage, forceHit, shipFriendlyFire)
-    local mindControl = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["mindControl"]
-    if mindControl.duration then
-        local roomId = Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, false)
-        local mindControlledCrew = 0
-        for crewmem in vter(shipManager.vCrewList) do
-            local doControl = (not mindControl.limit or mindControlledCrew < mindControl.limit) and
-                              crewmem.iShipId == shipManager.iShipId and
-                              crewmem.iRoomId == roomId
-            if doControl then
-                if can_be_mind_controlled(crewmem) then
-                    crewmem:SetMindControl(true)
-                    crew_data(crewmem).mcTime = mindControl.duration
-                    crew_data(crewmem).mcEndSound = mindControl.endSound
-                    mindControlledCrew = mindControlledCrew + 1
-                elseif crewmem:IsTelepathic() then
-                    crewmem.bResisted = true
+    if weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name] then
+        local mindControl = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["mindControl"]
+        if mindControl.duration then
+            local roomId = Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, false)
+            local mindControlledCrew = 0
+            for crewmem in vter(shipManager.vCrewList) do
+                local doControl = (not mindControl.limit or mindControlledCrew < mindControl.limit) and
+                                  crewmem.iShipId == shipManager.iShipId and
+                                  crewmem.iRoomId == roomId
+                if doControl then
+                    if can_be_mind_controlled(crewmem) then
+                        crewmem:SetMindControl(true)
+                        crew_data(crewmem).mcTime = mindControl.duration
+                        crew_data(crewmem).mcEndSound = mindControl.endSound
+                        mindControlledCrew = mindControlledCrew + 1
+                    elseif crewmem:IsTelepathic() then
+                        crewmem.bResisted = true
+                    end
                 end
             end
         end
