@@ -49,7 +49,7 @@ customTagsAll["augEffects"] = function(node) -- Gives a weapon or drone the effe
         end
         
         augEffect.effect = augEffectNode:first_attribute("effect"):value()
-        augEffect.amount = augEffectNode:first_attribute("amount"):value()
+        augEffect.amount = tonumber(augEffectNode:first_attribute("amount"):value())
         if not augEffectNode:first_attribute("needsPower") then 
             augEffect.needsPower = true  -- augEffects need power by default, could change
         else 
@@ -69,6 +69,7 @@ customTagsWeapons["mindControl"] = function(node) -- Makes a weapon mind control
     elseif not tonumber(mindControl.duration) then
         error("Invalid number for mindControl tag!", 2)
     end
+    mindControl.duration = tonumber(mindControl.duration)
     
     if node:first_attribute("limit") then
         mindControl.limit = tonumber(node:first_attribute("limit"):value())
