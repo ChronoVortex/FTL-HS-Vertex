@@ -85,6 +85,12 @@ customTagsWeapons["mindControl"] = function(node) -- Makes a weapon mind control
     
     return mindControl
 end
+customTagsWeapons["lockdownBeam"] = function(node) -- Makes a beam weapon lock down rooms
+    if not tonumber(node:value()) then
+        error("Invalid number for lockdownBeam tag!", 2)
+    end
+    return tonumber(node:value())
+end
 
 -- Parse custom tags in blueprints and save them to tables
 for _, file in ipairs(blueprintFiles) do
@@ -239,4 +245,13 @@ script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA, function(shipManage
         end
     end
     return Defines.Chain.CONTINUE, forceHit, shipFriendlyFire
+end)
+
+-- Handle lockdown beams
+script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManager, projectile, location, damage, realNewTile, beamHitType)
+    local lockdown = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["lockdownBeam"]
+    if lockdown > 0 and beamHitType == Defines.BeamHit.NEW_ROOM then
+        shipManager.ship:LockdownRoom(Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, true), location)
+    end
+    return Defines.Chain.CONTINUE, beamHitType
 end)
