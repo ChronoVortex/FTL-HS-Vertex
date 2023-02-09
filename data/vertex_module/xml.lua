@@ -204,7 +204,7 @@ script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManage
         for i, crewmem in ipairs(get_ship_crew_point(shipManager, location.x, location.y)) do
             if can_be_mind_controlled(crewmem) then
                 crewmem:SetMindControl(true)
-                crew_data(crewmem).mcTime = mindControl.duration
+                crew_data(crewmem).mcTime = math.max(mindControl.duration, crew_data(crewmem).mcTime or 0)
                 crew_data(crewmem).mcEndSound = mindControl.endSound
             elseif crewmem:IsTelepathic() and realNewTile then
                 crewmem.bResisted = true
@@ -228,7 +228,7 @@ script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA, function(shipManage
                 if doControl then
                     if can_be_mind_controlled(crewmem) then
                         crewmem:SetMindControl(true)
-                        crew_data(crewmem).mcTime = mindControl.duration
+                        crew_data(crewmem).mcTime = math.max(mindControl.duration, crew_data(crewmem).mcTime or 0)
                         crew_data(crewmem).mcEndSound = mindControl.endSound
                         mindControlledCrew = mindControlledCrew + 1
                     elseif crewmem:IsTelepathic() then
