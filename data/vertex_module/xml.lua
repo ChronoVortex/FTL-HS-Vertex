@@ -79,17 +79,34 @@ customTagsWeapons["mindControl"] = function(node) -- Makes a weapon mind control
     if node:first_attribute("endSound") then
         mindControl.endSound = node:first_attribute("endSound"):value()
         if not mindControl.endSound then
-            error("Invalid number for mindControl 'endSound' attribute!", 2)
+            error("Invalid mindControl 'endSound' attribute!", 2)
         end
     end
     
     return mindControl
 end
 customTagsWeapons["lockdownBeam"] = function(node) -- Makes a beam weapon lock down rooms
-    if not tonumber(node:value()) then
-        error("Invalid number for lockdownBeam tag!", 2)
+    local lockdown = {}
+    
+    if node:first_attribute("chance") then
+        lockdown.chance = tonumber(node:first_attribute("chance"):value())
+        if not lockdown.chance then
+            error("Invalid number for lockdown 'chance' attribute!", 2)
+        end
     end
-    return tonumber(node:value())
+    
+    lockdown.sounds = {}
+    for sound in Children(node) do
+        if sound:name() ~= "sound" then
+            error("Invalid child tag '"..sound:name().."' for 'lockdownBeam'!", 2)
+        end
+        if not sound:value() then
+            error("Invalid value for 'sound' child of 'lockdownBeam' tag!", 2)
+        end
+        table.insert(lockdown.sounds, sound:value())
+    end
+    
+    return lockdown
 end
 
 -- Parse custom tags in blueprints and save them to tables
@@ -250,8 +267,15 @@ end)
 -- Handle lockdown beams
 script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManager, projectile, location, damage, realNewTile, beamHitType)
     local lockdown = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["lockdownBeam"]
-    if lockdown > 0 and beamHitType == Defines.BeamHit.NEW_ROOM then
+    local doLockdown = 
+        not lockdown.chance or
+        lockdown.chance >= 10 or
+        (lockdown.chance > 0 and lockdown.chance > Hyperspace.random32()%10)
+    if doLockdown and beamHitType == Defines.BeamHit.NEW_ROOM then
         shipManager.ship:LockdownRoom(Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, true), location)
+        if #(lockdown.sounds) > 0 then
+            Hyperspace.Global.GetInstance():GetSoundControl():PlaySoundMix(lockdown.sounds[Hyperspace.random32()%#(lockdown.sounds) + 1], 1, false)
+        end
     end
     return Defines.Chain.CONTINUE, beamHitType
 end)
