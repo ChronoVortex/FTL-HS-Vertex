@@ -14,6 +14,7 @@ local under_mind_system = mods.vertexutil.under_mind_system
 local can_be_mind_controlled = mods.vertexutil.can_be_mind_controlled
 local get_ship_crew_point = mods.vertexutil.get_ship_crew_point
 local get_adjacent_rooms = mods.vertexutil.get_adjacent_rooms
+local get_room_at_location = mods.vertexutil.get_room_at_location
 local crew_data = mods.vertexutil.crew_data
 
 ------------
@@ -55,7 +56,7 @@ script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManage
             lockdown.chance >= 10 or
             (lockdown.chance > 0 and lockdown.chance > Hyperspace.random32()%10)
         if doLockdown and beamHitType == Defines.BeamHit.NEW_ROOM then
-            shipManager.ship:LockdownRoom(Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, true), location)
+            shipManager.ship:LockdownRoom(get_room_at_location(shipManager, location, true), location)
             if #(lockdown.sounds) > 0 then
                 Hyperspace.Global.GetInstance():GetSoundControl():PlaySoundMix(lockdown.sounds[Hyperspace.random32()%#(lockdown.sounds) + 1], 1, false)
             end

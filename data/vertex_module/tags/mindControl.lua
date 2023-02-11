@@ -14,6 +14,7 @@ local under_mind_system = mods.vertexutil.under_mind_system
 local can_be_mind_controlled = mods.vertexutil.can_be_mind_controlled
 local get_ship_crew_point = mods.vertexutil.get_ship_crew_point
 local get_adjacent_rooms = mods.vertexutil.get_adjacent_rooms
+local get_room_at_location = mods.vertexutil.get_room_at_location
 local crew_data = mods.vertexutil.crew_data
 
 ------------
@@ -92,8 +93,8 @@ end)
 script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA, function(shipManager, projectile, location, damage, forceHit, shipFriendlyFire)
     local mindControl = nil
     pcall(function() mindControl = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["mindControl"] end)
-    if mindControl and mindControl.duration then
-        local roomId = Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, false)
+    if mindControl and mindControl.duration and forceHit == Defines.Evasion.HIT then
+        local roomId = get_room_at_location(shipManager, location, true)
         local mindControlledCrew = 0
         for crewmem in vter(shipManager.vCrewList) do
             local doControl = (not mindControl.limit or mindControlledCrew < mindControl.limit) and

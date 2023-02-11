@@ -78,6 +78,11 @@ function mods.vertexutil.get_adjacent_rooms(shipId, roomId, diagonals)
     return adjacentRooms
 end
 
+-- Find ID of a room at the given location
+function mods.vertexutil.get_room_at_location(shipManager, location, includeWalls)
+    return Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, includeWalls)
+end
+
 ---------------------------
 -- BETTER PRINT FUNCTION --
 ---------------------------
