@@ -7,6 +7,7 @@
     <mod-append:script>data/vertex_module/xmlDataInit.lua</mod-append:script>
     
     <mod-append:script>data/vertex_module/tags/augEffects.lua</mod-append:script>
+    <mod-append:script>data/vertex_module/tags/hack.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/lockdownBeam.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/mindControl.lua</mod-append:script>
     
