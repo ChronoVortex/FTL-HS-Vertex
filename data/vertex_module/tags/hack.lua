@@ -29,7 +29,7 @@ customTagsWeapons["hack"] = function(node)
     
     hack.systemDurations = {}
     for systemDuration in Children(node) do
-        hack.systemDurations[systemDuration:name()] = systemDuration:value()
+        hack.systemDurations[systemDuration:name()] = tonumber(systemDuration:value())
     end
     
     return hack
@@ -73,12 +73,12 @@ local function handle_hack_for_ship(shipManager, clearShipId)
     else
         if #(systemHackTimers[clearShipId]) > 0 then
             for systemId in pairs(systemHackTimers[clearShipId]) do
-                systemHackTimers[clearShipId][systemId] = nil
+                systemHackTimers[clearShipId][systemId] = 0
             end
         end
         if #(artilleryHackTimers[clearShipId]) > 0 then
             for systemId in pairs(artilleryHackTimers[clearShipId]) do
-                artilleryHackTimers[clearShipId][systemId] = nil
+                artilleryHackTimers[clearShipId][systemId] = 0
             end
         end
     end
@@ -123,6 +123,13 @@ local function apply_hack(hack, shipManager, system)
                 systemHackTimers[shipManager.iShipId][system:GetId()] = math.max(
                     hack.duration,
                     systemHackTimers[shipManager.iShipId][system:GetId()] or 0)
+            end
+            
+            -- Stop mind control
+            if system:GetId() == 14 then
+                if shipManager.mindSystem.controlTimer.first < shipManager.mindSystem.controlTimer.second then
+                    shipManager.mindSystem.controlTimer.first = shipManager.mindSystem.controlTimer.second - Hyperspace.FPS.SpeedFactor/16
+                end
             end
         end
         
