@@ -27,6 +27,13 @@ customTagsWeapons["hack"] = function(node)
     hack.duration = tonumber(node:first_attribute("duration"):value())
     if not hack.duration then error("Invalid number for hack 'duration' attribute!", 2) end
     
+    if node:first_attribute("hitShieldDuration") then
+        hack.hitShieldDuration = tonumber(node:first_attribute("hitShieldDuration"):value())
+        if not hack.hitShieldDuration then
+            error("Invalid number for hack 'hitShieldDuration' attribute!", 2)
+        end
+    end
+    
     hack.systemDurations = {}
     for systemDuration in Children(node) do
         hack.systemDurations[systemDuration:name()] = tonumber(systemDuration:value())
@@ -149,11 +156,21 @@ script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManage
 end)
 
 -- Handle other hacking weapons
-script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA, function(shipManager, projectile, location, damage, forceHit, shipFriendlyFire)
+script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA_HIT, function(shipManager, projectile, location, damage, shipFriendlyFire)
     local hack = nil
     pcall(function() hack = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["hack"] end)
-    if hack and hack.duration and forceHit == Defines.Evasion.HIT then
+    if hack and hack.duration then
         apply_hack(hack, shipManager, shipManager:GetSystemInRoom(get_room_at_location(shipManager, location, true)))
     end
-    return Defines.Chain.CONTINUE, forceHit, shipFriendlyFire
+end)
+
+-- Hack shields if shield bubble hit
+script.on_internal_event(Defines.InternalEvents.SHIELD_COLLISION, function(shipManager, projectile, damage, response)
+    local hack = nil
+    pcall(function() hack = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["hack"] end)
+    if hack and hack.hitShieldDuration then
+        local shieldDuration = {}
+        shieldDuration["shields"] = hack.hitShieldDuration
+        apply_hack({systemDurations = shieldDuration}, shipManager, shipManager:GetSystem(0))
+    end
 end)

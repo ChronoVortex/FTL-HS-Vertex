@@ -90,10 +90,10 @@ script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManage
 end)
 
 -- Handle other mind control weapons
-script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA, function(shipManager, projectile, location, damage, forceHit, shipFriendlyFire)
+script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA_HIT, function(shipManager, projectile, location, damage, shipFriendlyFire)
     local mindControl = nil
     pcall(function() mindControl = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["mindControl"] end)
-    if mindControl and mindControl.duration and forceHit == Defines.Evasion.HIT then
+    if mindControl and mindControl.duration then
         local roomId = get_room_at_location(shipManager, location, true)
         local mindControlledCrew = 0
         for crewmem in vter(shipManager.vCrewList) do
@@ -112,5 +112,4 @@ script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA, function(shipManage
             end
         end
     end
-    return Defines.Chain.CONTINUE, forceHit, shipFriendlyFire
 end)
