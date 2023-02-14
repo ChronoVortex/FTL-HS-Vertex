@@ -149,7 +149,7 @@ end
 -- Handle hacking beams
 script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManager, projectile, location, damage, realNewTile, beamHitType)
     hack = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["hack"]
-    if hack and hack.duration and beamHitType == Defines.BeamHit.NEW_ROOM then
+    if hack and hack.duration and hack.duration > 0 and beamHitType == Defines.BeamHit.NEW_ROOM then
         apply_hack(hack, shipManager, shipManager:GetSystemInRoom(get_room_at_location(shipManager, location, true)))
     end
     return Defines.Chain.CONTINUE, beamHitType
@@ -159,7 +159,7 @@ end)
 script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA_HIT, function(shipManager, projectile, location, damage, shipFriendlyFire)
     local hack = nil
     pcall(function() hack = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["hack"] end)
-    if hack and hack.duration then
+    if hack and hack.duration and hack.duration > 0 then
         apply_hack(hack, shipManager, shipManager:GetSystemInRoom(get_room_at_location(shipManager, location, true)))
     end
 end)
@@ -168,7 +168,7 @@ end)
 script.on_internal_event(Defines.InternalEvents.SHIELD_COLLISION, function(shipManager, projectile, damage, response)
     local hack = nil
     pcall(function() hack = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["hack"] end)
-    if hack and hack.hitShieldDuration then
+    if hack and hack.hitShieldDuration and hack.hitShieldDuration > 0 then
         local shieldDuration = {}
         shieldDuration["shields"] = hack.hitShieldDuration
         apply_hack({systemDurations = shieldDuration}, shipManager, shipManager:GetSystem(0))
