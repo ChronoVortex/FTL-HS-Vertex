@@ -11,6 +11,7 @@
     <mod-append:script>data/vertex_module/tags/lockdownBeam.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/mindControl.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/noPowerFix.lua</mod-append:script>
+    <mod-append:script>data/vertex_module/tags/preignited.lua</mod-append:script>
     
     <mod-append:script>data/vertex_module/xmlDataRead.lua</mod-append:script>
 </mod:findLike>

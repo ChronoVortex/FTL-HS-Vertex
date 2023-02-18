@@ -20,7 +20,7 @@ local crew_data = mods.vertexutil.crew_data
 ------------
 -- PARSER --
 ------------
-customTagsAll["noPowerFix"] = function(node)
+customTagsWeapons["noPowerFix"] = function(node)
     return {doFix = true}
 end
 
