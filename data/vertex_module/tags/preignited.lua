@@ -8,6 +8,9 @@ local customTagsWeapons = mods.vertexdata.customTagsWeapons
 local customTagsDrones = mods.vertexdata.customTagsDrones
 local Children = mods.vertexdata.Children
 local parse_xml_bool = mods.vertexdata.parse_xml_bool
+local tag_add_all = mods.vertexdata.tag_add_all
+local tag_add_weapons = mods.vertexdata.tag_add_weapons
+local tag_add_drones = mods.vertexdata.tag_add_drones
 
 local vter = mods.vertexutil.vter
 local under_mind_system = mods.vertexutil.under_mind_system
@@ -20,29 +23,33 @@ local crew_data = mods.vertexutil.crew_data
 ------------
 -- PARSER --
 ------------
-customTagsWeapons["preignited"] = function(node)
+local function parser(node)
     return {doPreignite = true}
 end
 
 -----------
 -- LOGIC --
 -----------
-local wasJumping = false
-script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
-    local isJumping = false
-    if pcall(function() isJumping = Hyperspace.ships.player.bJumping end) then
-        if not isJumping and wasJumping then
-            local weapons = nil
-            pcall(function() weapons = Hyperspace.ships.player.weaponSystem.weapons end)
-            if weapons then
-                for weapon in vter(weapons) do
-                    local preignited = weaponInfo[weapon.blueprint.name]["preignited"]
-                    if preignited and preignited.doPreignite and weapon.powered and weapon.cooldown.first < weapon.cooldown.second then
-                        weapon.cooldown.first = weapon.cooldown.second - Hyperspace.FPS.SpeedFactor/16
+local function logic()
+    local wasJumping = false
+    script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
+        local isJumping = false
+        if pcall(function() isJumping = Hyperspace.ships.player.bJumping end) then
+            if not isJumping and wasJumping then
+                local weapons = nil
+                pcall(function() weapons = Hyperspace.ships.player.weaponSystem.weapons end)
+                if weapons then
+                    for weapon in vter(weapons) do
+                        local preignited = weaponInfo[weapon.blueprint.name]["preignited"]
+                        if preignited and preignited.doPreignite and weapon.powered and weapon.cooldown.first < weapon.cooldown.second then
+                            weapon.cooldown.first = weapon.cooldown.second - Hyperspace.FPS.SpeedFactor/16
+                        end
                     end
                 end
             end
+            wasJumping = isJumping
         end
-        wasJumping = isJumping
-    end
-end)
+    end)
+end
+
+tag_add_weapons("preignited", parser, logic)
