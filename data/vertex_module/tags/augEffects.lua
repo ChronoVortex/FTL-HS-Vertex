@@ -39,6 +39,11 @@ local function parser(node)
         else 
             augEffect.needsPower = parse_xml_bool(augEffectNode:first_attribute("needsPower"):value())
         end
+        if not augEffectNode:first_attribute("nostack") then 
+            augEffect.nostack = false  -- augEffects stack by default
+        else 
+            augEffect.nostack = parse_xml_bool(augEffectNode:first_attribute("nostack"):value())
+        end
         
         table.insert(augEffects, augEffect)
     end
@@ -49,26 +54,35 @@ end
 -- LOGIC --
 -----------
 local function logic()
+    local possibleValues = {}
+    
     local function get_aug_bonus(system, equipmentInfo, augName)
         local augBonusValue = 0
         if system then
             for equipment in vter(system) do
                 for _, augEffect in ipairs(equipmentInfo[equipment.blueprint.name]["augEffects"]) do
                     if augEffect.effect == augName and (not augEffect.needsPower or equipment.powered) then
-                        augBonusValue = augBonusValue + augEffect.amount
+                        if augEffect.nostack then
+                            table.insert(possibleValues, augEffect.amount)
+                        else
+                            augBonusValue = augBonusValue + augEffect.amount
+                        end
                     end
                 end
             end
         end
         return augBonusValue
     end
+    
     script.on_internal_event(Defines.InternalEvents.GET_AUGMENTATION_VALUE, function(shipManager, augName, augValue)
         local weapons, drones
         
         pcall(function() weapons = shipManager.weaponSystem.weapons end)
         pcall(function() drones = shipManager.droneSystem.drones end)
         
-        augValue = augValue + get_aug_bonus(weapons, weaponInfo, augName) + get_aug_bonus(drones, droneInfo, augName)
+        local total = augValue + get_aug_bonus(weapons, weaponInfo, augName) + get_aug_bonus(drones, droneInfo, augName)
+        augValue = math.max(total, table.unpack(possibleValues))
+        for i in ipairs(possibleValues) do possibleValues[i] = nil end
         
         return Defines.Chain.CONTINUE, augValue
     end)
