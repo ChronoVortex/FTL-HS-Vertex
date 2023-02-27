@@ -42,7 +42,7 @@ local function logic()
                     for weapon in vter(weapons) do
                         local preignited = weaponInfo[weapon.blueprint.name]["preignited"]
                         if preignited and preignited.doPreignite and weapon.powered and weapon.cooldown.first < weapon.cooldown.second then
-                            weapon.cooldown.first = weapon.cooldown.second - Hyperspace.FPS.SpeedFactor/16
+                            weapon:ForceCoolup()
                         end
                     end
                 end
