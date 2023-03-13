@@ -1,4 +1,5 @@
 mods.vertexutil = {}
+local INT_MAX = 2147483647
 
 ----------------------------
 -- MISC UTILITY FUNCTIONS --
@@ -81,6 +82,13 @@ end
 -- Find ID of a room at the given location
 function mods.vertexutil.get_room_at_location(shipManager, location, includeWalls)
     return Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, includeWalls)
+end
+
+-- Generate a random point within the radius of a given point
+function mods.vertexutil.random_point_radius(origin, radius)
+    local r = radius*math.sqrt(Hyperspace.random32()/INT_MAX)
+    local theta = 2*math.pi*(Hyperspace.random32()/INT_MAX)
+    return Hyperspace.Pointf(origin.x + r*math.cos(theta), origin.y + r*math.sin(theta))
 end
 
 ---------------------------
