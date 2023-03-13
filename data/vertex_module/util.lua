@@ -1,3 +1,7 @@
+if not Hyperspace.version or Hyperspace.version.major < 1 or Hyperspace.version.minor < 3 then
+    error("Incorrect Hyperspace version detected! Vertex Tags and Utility Functions requires Hyperspace 1.3+")
+end
+
 mods.vertexutil = {}
 local INT_MAX = 2147483647
 
