@@ -13,9 +13,7 @@ local blueprintFiles = {
 
 -- Parse custom tags in blueprints and save them to tables
 for _, file in ipairs(blueprintFiles) do
-    local doc = RapidXML.xml_document()
-    local text = Hyperspace.Resources:LoadFile(file)
-    doc:parse(text)
+    local doc = RapidXML.xml_document(file)
     local parent = doc:first_node("FTL")
     for node in Children(parent) do
         if node:name() == "weaponBlueprint" then
