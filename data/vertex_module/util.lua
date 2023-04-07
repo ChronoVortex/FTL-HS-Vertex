@@ -244,3 +244,23 @@ script.on_render_event(Defines.RenderEvents.GUI_CONTAINER, function() end, funct
     end
 end)
 script.on_game_event("START_BEACON", false, mods.vertexutil.HideTutorialArrow)
+
+function mods.vertexutil.timeIndex()
+    if Hyperspace.Global.GetInstance():GetCApp().world.space.gamePaused then
+      return 0
+    else
+      return Hyperspace.FPS.SpeedFactor / 16
+    end
+end
+
+local function iter(table, index)
+    index = index - 1
+    local value = table[index]
+    if value then
+    return index, value
+    end
+end
+  
+function mods.vertexutil.ipairs_reverse(table)
+    return iter, table, #table + 1
+end
