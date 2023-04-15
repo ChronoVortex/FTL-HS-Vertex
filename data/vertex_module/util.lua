@@ -264,3 +264,47 @@ end
 function mods.vertexutil.ipairs_reverse(table)
     return iter, table, #table + 1
 end
+
+local ipairs_reverse = mods.vertexutil.ipairs_reverse
+local timeIndex = mods.vertexutil.timeIndex
+
+mods.vertexutil.EffectVector = { 
+    lastVal = 0,
+    Update = function(self) --For effects that can be set once and changed whenever a timer runs out, as well as updating the timers.
+      local modifier = 0
+      for i, effect in ipairs_reverse(self) do --Iterate backwards for save removal during traversal.
+        effect.timer = effect.timer - timeIndex()
+        if effect.timer <= 0 then
+          modifier = modifier + effect.strength
+          table.remove(self, i)
+        end
+      end
+      return modifier
+    end,
+    Calculate = function(self) --For effects that have to be calculated ontick.
+        local strength = 0
+        for i, effect in ipairs(self) do
+            strength = strength + effect.strength
+        end
+        return strength
+    end,
+    Apply = function(self, effectDefinition) --NOTE: you must still manually apply the effect, this is just for durations and tracking so there's no interference with the native applications of the effect.
+      local effect = {
+        strength = effectDefinition.strength,
+        timer = effectDefinition.duration,
+      }
+      table.insert(self, effect)
+      self.lastVal = self.lastVal + effectDefinition.strength
+    end,
+    Clear = function(self)
+      for i, v in ipairs_reverse(self) do 
+        table.remove(self, i)
+      end
+    end,
+    New = function(self, o)
+      o = o or {}
+      self.__index = self
+      setmetatable(o, self)
+      return o
+    end,
+}

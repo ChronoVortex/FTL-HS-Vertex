@@ -13,6 +13,7 @@
     <mod-append:script>data/vertex_module/tags/noPowerFix.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/preignited.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/temporalEffects.lua</mod-append:script>
+    <mod-append:script>data/vertex_module/tags/limitEffects.lua</mod-append:script>
     <mod-append:script>data/vertex_module/xmlDataRead.lua</mod-append:script>
 </mod:findLike>
 

@@ -2,14 +2,13 @@
 -- IMPORTS --
 -------------
 local weaponInfo = mods.vertexdata.weaponInfo
-local Children = mods.vertexdata.Children
 local tag_add_weapons = mods.vertexdata.tag_add_weapons
 
 
 local vter = mods.vertexutil.vter
-local ipairs_reverse = mods.vertexutil.ipairs_reverse
 local get_room_at_location = mods.vertexutil.get_room_at_location
-local timeIndex = mods.vertexutil.timeIndex
+
+local EffectVector = mods.vertexutil.EffectVector
 
 ------------
 -- PARSER --
@@ -40,42 +39,6 @@ end
 -- LOGIC --
 -----------
 local function logic()
-    --Note: EffectVector can be repurposed for other effects as well, but I'm putting it local to here for now.
-    local EffectVector = { 
-        lastVal = 0,
-        Update = function(self)
-          local modifier = 0
-          for i, effect in ipairs_reverse(self) do
-            effect.timer = effect.timer - timeIndex()
-            if effect.timer <= 0 then
-              modifier = modifier + effect.strength
-              table.remove(self, i)
-            end
-          end
-          return modifier
-        end,
-        Apply = function(self, effectDefinition) --NOTE: you must still manually apply the effect, this is just for durations and tracking so there's no interference with the native applications of the effect.
-          local effect = {
-            strength = effectDefinition.strength,
-            timer = effectDefinition.duration,
-          }
-          table.insert(self, effect)
-          self.lastVal = self.lastVal + effectDefinition.strength
-        end,
-        Clear = function(self)
-          for i, v in ipairs_reverse(self) do 
-            table.remove(self, i)
-          end
-        end,
-        New = function(self, o)
-          o = o or {}
-          self.__index = self
-          setmetatable(o, self)
-          return o
-        end,
-    }
-    
-  
     local TEMPORAL_EFFECTS = {} --Table are unique, guarenteed to be a unique key.
     --Initialize room temporal effect tables.
     script.on_internal_event(Defines.InternalEvents.ON_TICK,
@@ -116,8 +79,12 @@ local function logic()
     local function TemporalWeaponDamage(ShipManager, Projectile, Location)
       local effectDefinition = weaponInfo[Projectile.extend.name]["temporalEffect"]
       local roomNumber = get_room_at_location(ShipManager, Location, true)
-      local room = ShipManager.ship.vRoomList[roomNumber]
-      if effectDefinition then
+      local room
+      if roomNumber ~= -1 then
+        room = ShipManager.ship.vRoomList[roomNumber]
+      end
+
+      if effectDefinition and room then
         room.extend.timeDilation = room.extend.timeDilation + effectDefinition.strength
         room.table[TEMPORAL_EFFECTS]:Apply(effectDefinition)
       end
@@ -144,5 +111,4 @@ tag_add_weapons("temporalEffect", parser, logic)
 
 
 
-  
   
