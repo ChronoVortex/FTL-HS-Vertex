@@ -39,6 +39,11 @@ local function parser(node)
         else 
             augEffect.needsPower = parse_xml_bool(augEffectNode:first_attribute("needsPower"):value())
         end
+        if not augEffectNode:first_attribute("chargeScaling") then 
+            augEffect.chargeScaling = false  -- augEffects do not scale by weapon charges by default
+        else 
+            augEffect.chargeScaling = parse_xml_bool(augEffectNode:first_attribute("chargeScaling"):value())
+        end
         if not augEffectNode:first_attribute("nostack") then 
             augEffect.nostack = false  -- augEffects stack by default
         else 
@@ -62,10 +67,14 @@ local function logic()
             for equipment in vter(system) do
                 for _, augEffect in ipairs(equipmentInfo[equipment.blueprint.name]["augEffects"]) do
                     if augEffect.effect == augName and (not augEffect.needsPower or equipment.powered) then
+                        local effectAmount = augEffect.amount
+                        if augEffect.chargeScaling and equipment.blueprint:GetType() == 0 then
+                            effectAmount = effectAmount*(equipment.chargeLevel/math.max(equipment.weaponVisual.iChargeLevels, 1))
+                        end
                         if augEffect.nostack then
-                            table.insert(possibleValues, augEffect.amount)
+                            table.insert(possibleValues, effectAmount)
                         else
-                            augBonusValue = augBonusValue + augEffect.amount
+                            augBonusValue = augBonusValue + effectAmount
                         end
                     end
                 end
