@@ -27,9 +27,9 @@ local function parser(node)
     local augEffects = {}
     for augEffectNode in Children(node) do
         local augEffect = {}
-        if not augEffectNode:first_attribute("effect") then error("augEffect tag requires an effect!", 2)
-        elseif not augEffectNode:first_attribute("amount") then error("augEffect tag requires an amount!", 2)
-        elseif not tonumber(augEffectNode:first_attribute("amount"):value()) then error("Invalid number for augEffect 'amount' attribute!", 2)
+        if not augEffectNode:first_attribute("effect") then error("augEffect tag requires an effect!")
+        elseif not augEffectNode:first_attribute("amount") then error("augEffect tag requires an amount!")
+        elseif not tonumber(augEffectNode:first_attribute("amount"):value()) then error("Invalid number for augEffect 'amount' attribute!")
         end
         
         augEffect.effect = augEffectNode:first_attribute("effect"):value()

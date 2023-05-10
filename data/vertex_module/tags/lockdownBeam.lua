@@ -30,17 +30,17 @@ local function parser(node)
     if node:first_attribute("chance") then
         lockdown.chance = tonumber(node:first_attribute("chance"):value())
         if not lockdown.chance then
-            error("Invalid number for lockdown 'chance' attribute!", 2)
+            error("Invalid number for lockdown 'chance' attribute!")
         end
     end
     
     lockdown.sounds = {}
     for sound in Children(node) do
         if sound:name() ~= "sound" then
-            error("Invalid child tag '"..sound:name().."' for 'lockdownBeam'!", 2)
+            error("Invalid child tag '"..sound:name().."' for 'lockdownBeam'!")
         end
         if not sound:value() then
-            error("Invalid value for 'sound' child of 'lockdownBeam' tag!", 2)
+            error("Invalid value for 'sound' child of 'lockdownBeam' tag!")
         end
         table.insert(lockdown.sounds, sound:value())
     end

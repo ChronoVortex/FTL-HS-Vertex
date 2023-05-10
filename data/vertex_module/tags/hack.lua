@@ -26,14 +26,14 @@ local crew_data = mods.vertexutil.crew_data
 local function parser(node)
     local hack = {}
     
-    if not node:first_attribute("duration") then error("hack tag requires a duration!", 2) end
+    if not node:first_attribute("duration") then error("hack tag requires a duration!") end
     hack.duration = tonumber(node:first_attribute("duration"):value())
-    if not hack.duration then error("Invalid number for hack 'duration' attribute!", 2) end
+    if not hack.duration then error("Invalid number for hack 'duration' attribute!") end
     
     if node:first_attribute("hitShieldDuration") then
         hack.hitShieldDuration = tonumber(node:first_attribute("hitShieldDuration"):value())
         if not hack.hitShieldDuration then
-            error("Invalid number for hack 'hitShieldDuration' attribute!", 2)
+            error("Invalid number for hack 'hitShieldDuration' attribute!")
         end
     end
     

@@ -28,23 +28,23 @@ local function parser(node)
     
     mindControl.duration = node:value()
     if not mindControl.duration then
-        error("mindControl tag requires a value for duration!", 2)
+        error("mindControl tag requires a value for duration!")
     elseif not tonumber(mindControl.duration) then
-        error("Invalid number for mindControl tag!", 2)
+        error("Invalid number for mindControl tag!")
     end
     mindControl.duration = tonumber(mindControl.duration)
     
     if node:first_attribute("limit") then
         mindControl.limit = tonumber(node:first_attribute("limit"):value())
         if not mindControl.limit then
-            error("Invalid number for mindControl 'limit' attribute!", 2)
+            error("Invalid number for mindControl 'limit' attribute!")
         end
     end
     
     if node:first_attribute("endSound") then
         mindControl.endSound = node:first_attribute("endSound"):value()
         if not mindControl.endSound then
-            error("Invalid mindControl 'endSound' attribute!", 2)
+            error("Invalid mindControl 'endSound' attribute!")
         end
     end
     
