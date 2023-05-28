@@ -4,13 +4,17 @@
 
 <mod:findLike type="scripts">
     <mod-append:script>data/vertex_module/util.lua</mod-append:script>
+    <mod-append:script>data/vertex_module/callbacks.lua</mod-append:script>
     <mod-append:script>data/vertex_module/xmlDataInit.lua</mod-append:script>
+    
+    <mod-append:script>data/vertex_module/particlesInit.lua</mod-append:script>
     
     <mod-append:script>data/vertex_module/tags/augEffects.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/hack.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/lockdownBeam.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/mindControl.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/noPowerFix.lua</mod-append:script>
+    <mod-append:script>data/vertex_module/tags/particleEmitters.lua</mod-append:script>
     <mod-append:script>data/vertex_module/tags/preignited.lua</mod-append:script>
     
     <mod-append:script>data/vertex_module/xmlDataRead.lua</mod-append:script>

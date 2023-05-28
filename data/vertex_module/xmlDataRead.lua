@@ -28,7 +28,7 @@ for _, file in ipairs(blueprintFiles) do
                         customTagsAll[tag].hooked = true
                     end
                     log("Found "..tag.." tag for weapon "..thisWeaponName)
-                    thisWeaponInfo[tag] = customTagsAll[tag].parser(wepNode)
+                    thisWeaponInfo[tag] = customTagsAll[tag].parser(wepNode, thisWeaponName)
                 end
                 if customTagsWeapons[tag] then
                     if not customTagsWeapons[tag].hooked then
@@ -37,7 +37,7 @@ for _, file in ipairs(blueprintFiles) do
                         customTagsWeapons[tag].hooked = true
                     end
                     log("Found "..tag.." tag for weapon "..thisWeaponName)
-                    thisWeaponInfo[tag] = customTagsWeapons[tag].parser(wepNode)
+                    thisWeaponInfo[tag] = customTagsWeapons[tag].parser(wepNode, thisWeaponName)
                 end
             end
             for tag in pairs(customTagsAll) do
@@ -63,7 +63,7 @@ for _, file in ipairs(blueprintFiles) do
                         customTagsAll[tag].hooked = true
                     end
                     log("Found "..tag.." tag for drone "..thisDroneName)
-                    thisDroneInfo[tag] = customTagsAll[tag].parser(droneNode)
+                    thisDroneInfo[tag] = customTagsAll[tag].parser(droneNode, thisDroneName)
                 end
                 if customTagsDrones[tag] then
                     if not customTagsDrones[tag].hooked then
@@ -72,7 +72,7 @@ for _, file in ipairs(blueprintFiles) do
                         customTagsDrones[tag].hooked = true
                     end
                     log("Found "..tag.." tag for drone "..thisDroneName)
-                    thisDroneInfo[tag] = customTagsDrones[tag].parser(droneNode)
+                    thisDroneInfo[tag] = customTagsDrones[tag].parser(droneNode, thisDroneName)
                 end
             end
             for tag in pairs(customTagsAll) do
