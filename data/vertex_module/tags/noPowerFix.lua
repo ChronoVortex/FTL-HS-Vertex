@@ -31,14 +31,19 @@ end
 -- LOGIC --
 -----------
 local function logic()
-    local function fix_no_power_projectiles(weapons)
-        for weapon in vter(weapons) do
-            local noPowerFix = weaponInfo[weapon.blueprint.name]["noPowerFix"]
-            if noPowerFix and noPowerFix.doFix then
-                local projectile = weapon:GetProjectile()
-                while projectile do
-                    Hyperspace.Global.GetInstance():GetCApp().world.space.projectiles:push_back(projectile)
-                    projectile = weapon:GetProjectile()
+    local function fix_no_power_projectiles(weapons, ship)
+        if not ship.weaponSystem:Powered() then
+            for weapon in vter(weapons) do
+                if weapon.requiredPower <= 0 then
+                    local noPowerFix = weaponInfo[weapon.blueprint.name]["noPowerFix"]
+                    if noPowerFix and noPowerFix.doFix then
+                        local projectile = weapon:GetProjectile()
+                        while projectile do
+                            Hyperspace.Global.GetInstance():GetCApp().world.space.projectiles:push_back(projectile)
+                            Defines.FireEvents.WEAPON_FIRE(ship, weapon, projectile)
+                            projectile = weapon:GetProjectile()
+                        end
+                    end
                 end
             end
         end
@@ -46,11 +51,11 @@ local function logic()
     script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
         local weaponsPlayer = nil
         pcall(function() weaponsPlayer = Hyperspace.ships.player.weaponSystem.weapons end)
-        if weaponsPlayer then fix_no_power_projectiles(weaponsPlayer) end
+        if weaponsPlayer then fix_no_power_projectiles(weaponsPlayer, Hyperspace.ships.player) end
         
         local weaponsEnemy = nil
         pcall(function() weaponsEnemy = Hyperspace.ships.enemy.weaponSystem.weapons end)
-        if weaponsEnemy then fix_no_power_projectiles(weaponsEnemy) end
+        if weaponsEnemy then fix_no_power_projectiles(weaponsEnemy, Hyperspace.ships.enemy) end
     end)
 end
 
