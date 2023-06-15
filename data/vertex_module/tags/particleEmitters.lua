@@ -52,7 +52,7 @@ local function logic()
     end)
     
     -- Emitter fire event
-    local function emitter_fire(ship, weapon, projectile)
+    local function emitter_fire(weapon)
         local weaponEmitters = particleEmitters.activeEmitters[weapon.blueprint.name]
         if weaponEmitters then
             for i, emitter in ipairs(weaponEmitters) do
@@ -60,9 +60,33 @@ local function logic()
             end
         end
     end
-    script.on_fire_event(Defines.FireEvents.WEAPON_FIRE, emitter_fire)
+    script.on_fire_event(Defines.FireEvents.WEAPON_FIRE, function(ship, weapon, projectile)
+        emitter_fire(weapon)
+    end)
     script.on_fire_event(Defines.FireEvents.ARTILLERY_FIRE, function(ship, artillery, projectile)
-        emitter_fire(ship, artillery.projectileFactory, projectile)
+        emitter_fire(artillery.projectileFactory)
+    end)
+
+    -- Emitter explosion event
+    local function emitter_explosion(projectile)
+        local weaponEmitters = particleEmitters.activeEmitters[projectile.extend.name]
+        if weaponEmitters then
+            for i, emitter in ipairs(weaponEmitters) do
+                particleEmitters:Emit(emitter, emitterEvents.EXPLOSION, nil, projectile.position.x, projectile.position.y, projectile.currentSpace)
+            end
+        end
+    end
+    script.on_internal_event(Defines.InternalEvents.DRONE_COLLISION, function(drone, projectile, damage, response)
+        emitter_explosion(projectile)
+    end)
+    script.on_internal_event(Defines.InternalEvents.PROJECTILE_COLLISION, function(thisProjectile, otherProjectile, damage, response)
+        emitter_explosion(thisProjectile)
+    end)
+    script.on_internal_event(Defines.InternalEvents.SHIELD_COLLISION, function(ship, projectile, damage, response)
+        emitter_explosion(projectile)
+    end)
+    script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA_HIT, function(ship, projectile, damage, response)
+        emitter_explosion(projectile)
     end)
 end
 

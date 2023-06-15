@@ -411,45 +411,57 @@ local function generate_shape_offset(emitter)
     return offsetX, offsetY
 end
 
--- TODO: add EXPLOSION event
-function particleEmitters:Emit(emitter, event, weapon)
+function particleEmitters:Emit(emitter, event, weapon, posX, posY, shipId)
     if event == emitter.on then
-        -- Calculate weapon coodinates with emitter offset
-        local weaponAnim = weapon.weaponVisual
-        local emitPointX, emitPointY
-        do
+        local emitPointX = posX or 0
+        local emitPointY = posY or 0
+        local rotate = false
+        local mirror = false
+        local vertMod = 1
+        if weapon then
+            rotate = weapon.mount.rotate
+            mirror = weapon.mount.mirror
+            if mirror then vertMod = -1 end
+            
+            -- Calculate weapon coodinates
+            local weaponAnim = weapon.weaponVisual
             local ship = Hyperspace.Global.GetInstance():GetShipManager(weapon.iShipId).ship
             local shipGraph = Hyperspace.ShipGraph.GetShipInfo(weapon.iShipId)
             local slideOffset = weaponAnim:GetSlide()
-            emitPointX = ship.shipImage.x + shipGraph.shipBox.x + weaponAnim.renderPoint.x + slideOffset.x
-            emitPointY = ship.shipImage.y + shipGraph.shipBox.y + weaponAnim.renderPoint.y + slideOffset.y
-        end
-        local vertMod = 1
-        if weapon.mount.mirror then vertMod = -1 end
-        if weapon.mount.rotate then
-            emitPointX = emitPointX - emitter.y + weaponAnim.mountPoint.y
-            emitPointY = emitPointY + (emitter.x - weaponAnim.mountPoint.x)*vertMod
+            emitPointX = emitPointX + ship.shipImage.x + shipGraph.shipBox.x + weaponAnim.renderPoint.x + slideOffset.x
+            emitPointY = emitPointY + ship.shipImage.y + shipGraph.shipBox.y + weaponAnim.renderPoint.y + slideOffset.y
+
+            -- Add emitter and mount point offset
+            if rotate then
+                emitPointX = emitPointX - emitter.y + weaponAnim.mountPoint.y
+                emitPointY = emitPointY + (emitter.x - weaponAnim.mountPoint.x)*vertMod
+            else
+                emitPointX = emitPointX + (emitter.x - weaponAnim.mountPoint.x)*vertMod
+                emitPointY = emitPointY + emitter.y - weaponAnim.mountPoint.y
+            end
         else
-            emitPointX = emitPointX + (emitter.x - weaponAnim.mountPoint.x)*vertMod
-            emitPointY = emitPointY + emitter.y - weaponAnim.mountPoint.y
+            emitPointX = emitPointX + emitter.x
+            emitPointY = emitPointY + emitter.y
         end
-        
+
         -- Emit particles
         if emitter.shape then
-            if weapon.mount.rotate then
+            if rotate then
                 for i = 1, emitter.count do
                     local offsetX, offsetY = generate_shape_offset(emitter)
-                    particles:Create(emitter.type, emitPointX - offsetY, emitPointY + offsetX*vertMod, weapon.iShipId, emitter.layer, weapon.mount.rotate, weapon.mount.mirror)
+                    particles:Create(emitter.type, emitPointX - offsetY, emitPointY + offsetX*vertMod, shipId or weapon.iShipId,
+                        emitter.layer, rotate, mirror)
                 end
             else
                 for i = 1, emitter.count do
                     local offsetX, offsetY = generate_shape_offset(emitter)
-                    particles:Create(emitter.type, emitPointX + offsetX*vertMod, emitPointY + offsetY, weapon.iShipId, emitter.layer, weapon.mount.rotate, weapon.mount.mirror)
+                    particles:Create(emitter.type, emitPointX + offsetX*vertMod, emitPointY + offsetY, shipId or weapon.iShipId,
+                        emitter.layer, rotate, mirror)
                 end
             end
         else
             for i = 1, emitter.count do
-                particles:Create(emitter.type, emitPointX, emitPointY, weapon.iShipId, emitter.layer, weapon.mount.rotate, weapon.mount.mirror)
+                particles:Create(emitter.type, emitPointX, emitPointY, shipId or weapon.iShipId, emitter.layer, rotate, mirror)
             end
         end
     end
