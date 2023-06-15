@@ -63,6 +63,9 @@ local particleTypes = mods.vertexparts.particleTypes
 mods.vertexparts.emitterEvents = {}
 local emitterEvents = mods.vertexparts.emitterEvents
 
+mods.vertexparts.emitterShapes = {}
+local emitterShapes = mods.vertexparts.emitterShapes
+
 mods.vertexparts.particleEmitters = {}
 local particleEmitters = mods.vertexparts.particleEmitters
 particleEmitters.activeEmitters = {}
@@ -291,7 +294,10 @@ end
 emitterEvents.FIRE = 0
 emitterEvents.EXPLOSION = 1
 
--- TODO: add shapes, add EXPLOSION event
+emitterShapes.LINE = 0
+emitterShapes.RECT = 1
+emitterShapes.ELLIPSE = 2
+
 function particleEmitters:ParseNew(particleEmitterNode, weaponName)
     local partEmitter = {}
     local baseEmitterName = nil
@@ -354,9 +360,58 @@ function particleEmitters:ParseNew(particleEmitterNode, weaponName)
             partEmitter.layer = particleLayers.TOP
         end
     end
+    
+    -- Shape
+    local shapeNode = particleEmitterNode:first_node("shape")
+    if shapeNode then
+        partEmitter.shape = emitterShapes[node_get_value(shapeNode, "particleEmitter shape tag requires a valid value!")]
+    end
+    
+    -- Shape size
+    if baseEmitterName or not partEmitter.shape then
+        partEmitter.width = node_get_number_default(particleEmitterNode:first_node("w"), nil)
+        partEmitter.height = node_get_number_default(particleEmitterNode:first_node("h"), nil)
+    else
+        partEmitter.width = node_get_number(particleEmitterNode:first_node("w"), "particleEmitter with shape tag requires a valid width!")
+        partEmitter.height = node_get_number(particleEmitterNode:first_node("h"), "particleEmitter with shape tag requires a valid height!")
+    end
+    if partEmitter.width then
+        if partEmitter.shape == emitterShapes.LINE then
+            if partEmitter.width == 0 and partEmitter.width == 0 then error("particleEmitter with LINE shape must have non-zero width or height!") end
+        else
+            if partEmitter.width == 0 or partEmitter.width == 0 then error("particleEmitter with non-LINE shape must have non-zero width and height!") end
+        end
+    end
 end
 
--- TODO: add shapes, add EXPLOSION event
+local function generate_shape_offset(emitter)
+    local offsetX, offsetY
+    if emitter.shape == emitterShapes.LINE then
+        local offsetMagnitude = Hyperspace.random32()/INT_MAX
+        offsetX = offsetMagnitude*emitter.width
+        offsetY = offsetMagnitude*emitter.height
+    elseif emitter.shape == emitterShapes.RECT then
+        if emitter.width < 0 then
+            offsetX = rand_range(emitter.width, 0)
+        else
+            offsetX = rand_range(0, emitter.width)
+        end
+        if emitter.height < 0 then
+            offsetY = rand_range(emitter.height, 0)
+        else
+            offsetY = rand_range(0, emitter.height)
+        end
+    elseif emitter.shape == emitterShapes.ELLIPSE then
+        local halfWidth = emitter.width/2
+        local r = halfWidth*math.sqrt(Hyperspace.random32()/INT_MAX)
+        local theta = 2*math.pi*(Hyperspace.random32()/INT_MAX)
+        offsetX = halfWidth + r*math.cos(theta)
+        offsetY = (halfWidth + r*math.sin(theta))*(emitter.height/emitter.width)
+    end
+    return offsetX, offsetY
+end
+
+-- TODO: add EXPLOSION event
 function particleEmitters:Emit(emitter, event, weapon)
     if event == emitter.on then
         -- Calculate weapon coodinates with emitter offset
@@ -380,8 +435,22 @@ function particleEmitters:Emit(emitter, event, weapon)
         end
         
         -- Emit particles
-        for i = 1, emitter.count do
-            particles:Create(emitter.type, emitPointX, emitPointY, weapon.iShipId, emitter.layer, weapon.mount.rotate, weapon.mount.mirror)
+        if emitter.shape then
+            if weapon.mount.rotate then
+                for i = 1, emitter.count do
+                    local offsetX, offsetY = generate_shape_offset(emitter)
+                    particles:Create(emitter.type, emitPointX - offsetY, emitPointY + offsetX*vertMod, weapon.iShipId, emitter.layer, weapon.mount.rotate, weapon.mount.mirror)
+                end
+            else
+                for i = 1, emitter.count do
+                    local offsetX, offsetY = generate_shape_offset(emitter)
+                    particles:Create(emitter.type, emitPointX + offsetX*vertMod, emitPointY + offsetY, weapon.iShipId, emitter.layer, weapon.mount.rotate, weapon.mount.mirror)
+                end
+            end
+        else
+            for i = 1, emitter.count do
+                particles:Create(emitter.type, emitPointX, emitPointY, weapon.iShipId, emitter.layer, weapon.mount.rotate, weapon.mount.mirror)
+            end
         end
     end
 end
