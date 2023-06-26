@@ -1,5 +1,5 @@
-if not (Hyperspace.version and Hyperspace.version.major == 1 and Hyperspace.version.minor >= 3) then
-    error("Incorrect Hyperspace version detected! Vertex Tags and Utility Functions requires Hyperspace 1.3+")
+if not (Hyperspace.version and Hyperspace.version.major == 1 and Hyperspace.version.minor >= 4) then
+    error("Incorrect Hyperspace version detected! Vertex Tags and Utility Functions requires Hyperspace 1.4+")
 end
 
 mods.vertexutil = {}

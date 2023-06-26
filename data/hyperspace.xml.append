@@ -4,7 +4,6 @@
 
 <mod:findLike type="scripts">
     <mod-append:script>data/vertex_module/util.lua</mod-append:script>
-    <mod-append:script>data/vertex_module/callbacks.lua</mod-append:script>
     <mod-append:script>data/vertex_module/xmlDataInit.lua</mod-append:script>
     
     <mod-append:script>data/vertex_module/particlesInit.lua</mod-append:script>

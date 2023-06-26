@@ -52,27 +52,25 @@ local function logic()
     end)
     
     -- Emitter fire event
-    local function emitter_fire(weapon)
-        local weaponEmitters = particleEmitters.activeEmitters[weapon.blueprint.name]
-        if weaponEmitters then
-            for i, emitter in ipairs(weaponEmitters) do
-                particleEmitters:Emit(emitter, emitterEvents.FIRE, weapon)
+    script.on_internal_event(Defines.InternalEvents.PROJECTILE_FIRE, function(projectile, weapon)
+        if weapon then
+            local weaponEmitters = particleEmitters.activeEmitters[weapon.blueprint.name]
+            if weaponEmitters then
+                for i, emitter in ipairs(weaponEmitters) do
+                    particleEmitters:Emit(emitter, emitterEvents.FIRE, weapon)
+                end
             end
         end
-    end
-    script.on_fire_event(Defines.FireEvents.WEAPON_FIRE, function(ship, weapon, projectile)
-        emitter_fire(weapon)
-    end)
-    script.on_fire_event(Defines.FireEvents.ARTILLERY_FIRE, function(ship, artillery, projectile)
-        emitter_fire(artillery.projectileFactory)
     end)
 
     -- Emitter explosion event
     local function emitter_explosion(projectile)
-        local weaponEmitters = particleEmitters.activeEmitters[projectile.extend.name]
-        if weaponEmitters then
-            for i, emitter in ipairs(weaponEmitters) do
-                particleEmitters:Emit(emitter, emitterEvents.EXPLOSION, nil, projectile.position.x, projectile.position.y, projectile.currentSpace)
+        if projectile then
+            local weaponEmitters = particleEmitters.activeEmitters[projectile.extend.name]
+            if weaponEmitters then
+                for i, emitter in ipairs(weaponEmitters) do
+                    particleEmitters:Emit(emitter, emitterEvents.EXPLOSION, nil, projectile.position.x, projectile.position.y, projectile.currentSpace)
+                end
             end
         end
     end

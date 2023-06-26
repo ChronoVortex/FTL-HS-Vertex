@@ -2,7 +2,7 @@
     <title><![CDATA[ Vertex Tags and Utility Functions ]]></title>
     <threadUrl><![CDATA[ https://github.com/ChronoVortex/FTL-HS-Vertex ]]></threadUrl>
     <author><![CDATA[ Vertaalfout, Chrono Vortex ]]></author>
-    <version><![CDATA[ 2.1 ]]></version>
+    <version><![CDATA[ 3.0 ]]></version>
     <description>
 <![CDATA[
 This mod has no content, instead adding new tags and LUA utility functions for other mods to build off of.
