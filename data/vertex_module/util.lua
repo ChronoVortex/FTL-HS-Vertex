@@ -157,6 +157,12 @@ function mods.vertexutil.random_point_radius(origin, radius)
     return Hyperspace.Pointf(origin.x + r*math.cos(theta), origin.y + r*math.sin(theta))
 end
 
+-- Get a table for a userdata value by name
+function mods.vertexutil.userdata_table(userdata, tableName)
+    if not userdata.table[tableName] then userdata.table[tableName] = {} end
+    return userdata.table[tableName]
+end
+
 ---------------------------
 -- BETTER PRINT FUNCTION --
 ---------------------------
@@ -215,54 +221,6 @@ end
 
 function printf(...)
     return print(string.format(...))
-end
-
------------------------
--- CREW DATA MANAGER --
------------------------
--- Set up a table that always contains all CrewMember instances
-local crewtable = {}
-script.on_internal_event(Defines.InternalEvents.CREW_LOOP, function(crewmember)
-    local crewId = Hyperspace.Get_CrewMember_Extend(crewmember).selfId
-    if not crewtable[crewId] then
-        crewtable[crewId] = {}
-    end
-end, 1000) -- Priority such that this runs before all CREW_LOOP functions that assume the existance of this table
-
--- Clean out old CrewMember instances every 5 seconds
-local cycleTime = 5
-local timer = 0
-script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
-    timer = timer + Hyperspace.FPS.SpeedFactor/16
-    if timer > cycleTime then
-        timer = 0
-        
-        -- Find all existing crew members
-        local shouldSave = {}
-        local crewCheckList = nil
-        if pcall(function() crewCheckList = Hyperspace.ships.player.vCrewList end) then
-            for existingCrew in vter(crewCheckList) do
-                shouldSave[Hyperspace.Get_CrewMember_Extend(existingCrew).selfId] = true
-            end
-        end
-        if pcall(function() crewCheckList = Hyperspace.ships.enemy.vCrewList end) then
-            for existingCrew in vter(crewCheckList) do
-                shouldSave[Hyperspace.Get_CrewMember_Extend(existingCrew).selfId] = true
-            end
-        end
-
-        -- Remove crew members that no longer exist
-        for crewId in pairs(crewtable) do
-            if not shouldSave[crewId] then
-                crewtable[crewId] = nil
-            end
-        end
-    end
-end)
-
--- For access to the data outside of this file
-function mods.vertexutil.crew_data(crewmember)
-    return crewtable[Hyperspace.Get_CrewMember_Extend(crewmember).selfId]
 end
 
 ----------------------------

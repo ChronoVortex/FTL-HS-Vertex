@@ -18,7 +18,6 @@ local can_be_mind_controlled = mods.vertexutil.can_be_mind_controlled
 local get_ship_crew_point = mods.vertexutil.get_ship_crew_point
 local get_adjacent_rooms = mods.vertexutil.get_adjacent_rooms
 local get_room_at_location = mods.vertexutil.get_room_at_location
-local crew_data = mods.vertexutil.crew_data
 
 local particleLayers = mods.vertexparts.particleLayers
 local particles = mods.vertexparts.particles
@@ -45,7 +44,7 @@ local function logic()
     end, function(ship)
         particles:Render(ship.iShipId, particleLayers.TOP)
     end)
-    script.on_internal_event(Defines.InternalEvents.ON_TICK, function(ship)
+    script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
         if not Hyperspace.Global.GetInstance():GetCApp().world.space.gamePaused then
             particles:Update()
         end

@@ -18,7 +18,7 @@ local can_be_mind_controlled = mods.vertexutil.can_be_mind_controlled
 local get_ship_crew_point = mods.vertexutil.get_ship_crew_point
 local get_adjacent_rooms = mods.vertexutil.get_adjacent_rooms
 local get_room_at_location = mods.vertexutil.get_room_at_location
-local crew_data = mods.vertexutil.crew_data
+local userdata_table = mods.vertexutil.userdata_table
 
 ------------
 -- PARSER --
@@ -57,20 +57,20 @@ end
 local function logic()
     -- Handle crew mind controlled by weapons
     script.on_internal_event(Defines.InternalEvents.CREW_LOOP, function(crewmem)
-        local crewmemData = crew_data(crewmem)
-        if crewmemData.mcTime then
+        local mcTable = userdata_table(crewmem, "mods.vertex.mc")
+        if mcTable.mcTime then
             if crewmem.bDead then
-                crewmemData.mcTime = nil
-                crewmemData.mcEndSound = nil
+                mcTable.mcTime = nil
+                mcTable.mcEndSound = nil
             else
-                crewmemData.mcTime = math.max(crewmemData.mcTime - Hyperspace.FPS.SpeedFactor/16, 0)
-                if crewmemData.mcTime == 0 then
+                mcTable.mcTime = math.max(mcTable.mcTime - Hyperspace.FPS.SpeedFactor/16, 0)
+                if mcTable.mcTime == 0 then
                     crewmem:SetMindControl(false)
-                    if crewmemData.mcEndSound then
-                        Hyperspace.Global.GetInstance():GetSoundControl():PlaySoundMix(crewmemData.mcEndSound, 1, false)
+                    if mcTable.mcEndSound then
+                        Hyperspace.Global.GetInstance():GetSoundControl():PlaySoundMix(mcTable.mcEndSound, 1, false)
                     end
-                    crewmemData.mcTime = nil
-                    crewmemData.mcEndSound = nil
+                    mcTable.mcTime = nil
+                    mcTable.mcEndSound = nil
                 end
             end
         end
@@ -83,8 +83,9 @@ local function logic()
             for i, crewmem in ipairs(get_ship_crew_point(shipManager, location.x, location.y)) do
                 if can_be_mind_controlled(crewmem) then
                     crewmem:SetMindControl(true)
-                    crew_data(crewmem).mcTime = math.max(mindControl.duration, crew_data(crewmem).mcTime or 0)
-                    crew_data(crewmem).mcEndSound = mindControl.endSound
+                    local mcTable = userdata_table(crewmem, "mods.vertex.mc")
+                    mcTable.mcTime = math.max(mindControl.duration, mcTable.mcTime or 0)
+                    mcTable.mcEndSound = mindControl.endSound
                 elseif crewmem:IsTelepathic() and realNewTile then
                     crewmem.bResisted = true
                 end
@@ -107,8 +108,9 @@ local function logic()
                 if doControl then
                     if can_be_mind_controlled(crewmem) then
                         crewmem:SetMindControl(true)
-                        crew_data(crewmem).mcTime = math.max(mindControl.duration, crew_data(crewmem).mcTime or 0)
-                        crew_data(crewmem).mcEndSound = mindControl.endSound
+                        local mcTable = userdata_table(crewmem, "mods.vertex.mc")
+                        mcTable.mcTime = math.max(mindControl.duration, mcTable.mcTime or 0)
+                        mcTable.mcEndSound = mindControl.endSound
                         mindControlledCrew = mindControlledCrew + 1
                     elseif crewmem:IsTelepathic() then
                         crewmem.bResisted = true
