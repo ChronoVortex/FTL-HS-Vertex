@@ -79,8 +79,12 @@ local function logic()
     script.on_internal_event(Defines.InternalEvents.PROJECTILE_COLLISION, function(thisProjectile, otherProjectile, damage, response)
         emitter_explosion(thisProjectile)
     end)
-    script.on_internal_event(Defines.InternalEvents.SHIELD_COLLISION, function(ship, projectile, damage, response)
-        emitter_explosion(projectile)
+    script.on_internal_event(Defines.InternalEvents.SHIELD_COLLISION_PRE, function(ship, projectile, damage, response)
+        local shieldPower = nil
+        pcall(function() shieldPower = ship.shieldSystem.shields.power end)
+        if not shieldPower or shieldPower.super.first > 0 or shieldPower.first > damage.iShieldPiercing then
+            emitter_explosion(projectile)
+        end
     end)
     script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA_HIT, function(ship, projectile, damage, response)
         emitter_explosion(projectile)
