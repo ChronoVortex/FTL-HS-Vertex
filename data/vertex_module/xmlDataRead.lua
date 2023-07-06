@@ -14,8 +14,7 @@ local blueprintFiles = {
 -- Parse custom tags in blueprints and save them to tables
 for _, file in ipairs(blueprintFiles) do
     local doc = RapidXML.xml_document(file)
-    local parent = doc:first_node("FTL")
-    for node in Children(parent) do
+    for node in Children(doc:first_node("FTL") or doc) do
         if node:name() == "weaponBlueprint" then
             local thisWeaponInfo = {}
             local thisWeaponName = node:first_attribute("name"):value()

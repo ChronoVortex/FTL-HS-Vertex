@@ -476,7 +476,7 @@ local animationFiles = {
 }
 for _, file in ipairs(animationFiles) do
     local doc = RapidXML.xml_document(file)
-    for node in Children(doc:first_node("FTL")) do
+    for node in Children(doc:first_node("FTL") or doc) do
         if node:name() == "particleType" then
             particleTypes:ParseNew(node)
         elseif node:name() == "particleEmitter" then
