@@ -1,5 +1,5 @@
-if not (Hyperspace.version and Hyperspace.version.major == 1 and Hyperspace.version.minor >= 4) then
-    error("Incorrect Hyperspace version detected! Vertex Tags and Utility Functions requires Hyperspace 1.4+")
+if not (Hyperspace.version and Hyperspace.version.major == 1 and Hyperspace.version.minor >= 6) then
+    error("Incorrect Hyperspace version detected! Vertex Tags and Utility Functions requires Hyperspace 1.6+")
 end
 
 mods.vertexutil = {}
@@ -97,9 +97,23 @@ function mods.vertexutil.under_mind_system(crewmem)
 end
 local under_mind_system = mods.vertexutil.under_mind_system
 
+-- Check if a given crew member is resistant to mind control
+function mods.vertexutil.resists_mind_control(crewmem)
+    do
+        local _, telepathic = crewmem.extend:CalculateStat(Hyperspace.CrewStat.IS_TELEPATHIC)
+        if telepathic then return true end
+    end
+    do
+        local _, resistMc = crewmem.extend:CalculateStat(Hyperspace.CrewStat.RESISTS_MIND_CONTROL)
+        if resistMc then return true end
+    end
+    return false
+end
+local resists_mind_control = mods.vertexutil.resists_mind_control
+
 -- Check if a given crew member can be mind controlled
 function mods.vertexutil.can_be_mind_controlled(crewmem)
-    return not (crewmem:IsTelepathic() or crewmem:IsDrone()) and not under_mind_system(crewmem)
+    return not (crewmem:IsDrone() or resists_mind_control(crewmem)) and not under_mind_system(crewmem)
 end
 
 -- Returns a table of all crew belonging to the given ship on the room tile at the given point
@@ -148,6 +162,15 @@ end
 -- Find ID of a room at the given location
 function mods.vertexutil.get_room_at_location(shipManager, location, includeWalls)
     return Hyperspace.ShipGraph.GetShipInfo(shipManager.iShipId):GetSelectedRoom(location.x, location.y, includeWalls)
+end
+
+-- Check if a weapon's current shot is its first
+function mods.vertexutil.is_first_shot(weapon, afterFirstShot)
+    local shots = weapon.numShots
+    if weapon.weaponVisual.iChargeLevels > 0 then shots = shots*(weapon.weaponVisual.boostLevel + 1) end
+    if weapon.blueprint.miniProjectiles:size() > 0 then shots = shots*weapon.blueprint.miniProjectiles:size() end
+    if afterFirstShot then shots = shots - 1 end
+    return shots == weapon.queuedProjectiles:size()
 end
 
 -- Generate a random point within the radius of a given point

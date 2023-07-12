@@ -14,6 +14,7 @@ local tag_add_drones = mods.vertexdata.tag_add_drones
 
 local vter = mods.vertexutil.vter
 local under_mind_system = mods.vertexutil.under_mind_system
+local resists_mind_control = mods.vertexutil.resists_mind_control
 local can_be_mind_controlled = mods.vertexutil.can_be_mind_controlled
 local get_ship_crew_point = mods.vertexutil.get_ship_crew_point
 local get_adjacent_rooms = mods.vertexutil.get_adjacent_rooms
@@ -86,7 +87,7 @@ local function logic()
                     local mcTable = userdata_table(crewmem, "mods.vertex.mc")
                     mcTable.mcTime = math.max(mindControl.duration, mcTable.mcTime or 0)
                     mcTable.mcEndSound = mindControl.endSound
-                elseif crewmem:IsTelepathic() and realNewTile then
+                elseif resists_mind_control(crewmem) and realNewTile then
                     crewmem.bResisted = true
                 end
             end
@@ -112,7 +113,7 @@ local function logic()
                         mcTable.mcTime = math.max(mindControl.duration, mcTable.mcTime or 0)
                         mcTable.mcEndSound = mindControl.endSound
                         mindControlledCrew = mindControlledCrew + 1
-                    elseif crewmem:IsTelepathic() then
+                    elseif resists_mind_control(crewmem) then
                         crewmem.bResisted = true
                     end
                 end
