@@ -103,9 +103,9 @@ local function logic()
             local roomId = get_room_at_location(shipManager, location, true)
             local mindControlledCrew = 0
             for crewmem in vter(shipManager.vCrewList) do
-                local doControl = (not mindControl.limit or mindControlledCrew < mindControl.limit) and
-                                  crewmem.iShipId == shipManager.iShipId and
-                                  crewmem.iRoomId == roomId
+                local doControl = crewmem.iRoomId == roomId and
+                                  crewmem.currentShipId == shipManager.iShipId and
+                                  crewmem.iShipId ~= projectile.ownerId
                 if doControl then
                     if can_be_mind_controlled(crewmem) then
                         crewmem:SetMindControl(true)
@@ -113,6 +113,7 @@ local function logic()
                         mcTable.mcTime = math.max(mindControl.duration, mcTable.mcTime or 0)
                         mcTable.mcEndSound = mindControl.endSound
                         mindControlledCrew = mindControlledCrew + 1
+                        if mindControl.limit and mindControlledCrew >= mindControl.limit then break end
                     elseif resists_mind_control(crewmem) then
                         crewmem.bResisted = true
                     end
