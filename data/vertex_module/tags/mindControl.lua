@@ -80,7 +80,7 @@ local function logic()
     -- Handle mind control beams
     script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManager, projectile, location, damage, realNewTile, beamHitType)
         local mindControl = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["mindControl"]
-        if mindControl.duration then -- Doesn't check realNewTile anymore 'cause the beam kept missing crew that were on the move
+        if mindControl and mindControl.duration then -- Doesn't check realNewTile anymore 'cause the beam kept missing crew that were on the move
             for i, crewmem in ipairs(get_ship_crew_point(shipManager, location.x, location.y)) do
                 if can_be_mind_controlled(crewmem) then
                     crewmem:SetMindControl(true)
