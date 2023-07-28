@@ -286,4 +286,5 @@ script.on_render_event(Defines.RenderEvents.GUI_CONTAINER, function() end, funct
         tutArrow.timer = (tutArrow.timer + Hyperspace.FPS.SpeedFactor/16)%(2*tutArrowAlphaInterval)
     end
 end)
+script.on_game_event("START_GAME", false, mods.vertexutil.HideTutorialArrow)
 script.on_game_event("START_BEACON", false, mods.vertexutil.HideTutorialArrow)
