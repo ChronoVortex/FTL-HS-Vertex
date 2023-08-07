@@ -113,7 +113,7 @@ local resists_mind_control = mods.vertexutil.resists_mind_control
 
 -- Check if a given crew member can be mind controlled
 function mods.vertexutil.can_be_mind_controlled(crewmem)
-    return not (crewmem:IsDrone() or resists_mind_control(crewmem)) and not under_mind_system(crewmem)
+    return not (crewmem:IsDrone() or resists_mind_control(crewmem) or under_mind_system(crewmem))
 end
 
 -- Returns a table of all crew belonging to the given ship on the room tile at the given point
@@ -138,7 +138,7 @@ function mods.vertexutil.get_adjacent_rooms(shipId, roomId, diagonals)
     local roomShape = shipGraph:GetRoomShape(roomId)
     local adjacentRooms = {}
     local currentRoom = nil
-    function check_for_room(x, y)
+    local function check_for_room(x, y)
         currentRoom = shipGraph:GetSelectedRoom(x, y, false)
         if currentRoom > -1 then adjacentRooms[currentRoom] = true end
     end
@@ -184,66 +184,6 @@ end
 function mods.vertexutil.userdata_table(userdata, tableName)
     if not userdata.table[tableName] then userdata.table[tableName] = {} end
     return userdata.table[tableName]
-end
-
----------------------------
--- BETTER PRINT FUNCTION --
----------------------------
-local PrintHelper = {
-    queue = {},
-
-    timer = 999,           -- So it doesn't render on game startup
-    config = {
-        x = 154,           -- x coordinate of printed lines
-        y = 100,           -- y coordinate of printed lines
-        font = 10,         -- The font to use
-        line_length = 250, -- How long a line can be before it is broken
-        duration = 5,      -- The number of seconds before something is cleared from the console
-        messages = 10,     -- How many messages can be on the console at once
-        use_speed = false, -- If true, uses game speed, if false, uses real time
-    },
-    Render = function(self)
-        if self.timer <= self.config.duration then
-           Graphics.freetype.easy_printAutoNewlines(
-               self.config.font,
-               self.config.x,
-               self.config.y,
-               self.config.line_length,
-               table.concat(self.queue, "\n")
-           )
-            local increment = self.config.use_speed and (Hyperspace.FPS.SpeedFactor/16) or (1/Hyperspace.FPS.NumFrames)
-            self.timer = self.timer + increment
-        else
-            self.timer = 0
-            table.remove(self.queue, 1)
-        end
-    end,
-    
-    AddString = function(self, ...)
-        self.timer = 0
-        local string = ""
-        for i = 1, select("#", ...) do
-          string = string..tostring(select(i, ...)) .. "    "
-        end
-        table.insert(self.queue, string)
-        if #self.queue > self.config.messages then
-            table.remove(self.queue, 1)
-        end
-    end,
-}
-
-script.on_render_event(Defines.RenderEvents.MOUSE_CONTROL, function() end, function()
-    PrintHelper:Render()
-end)
-
-local OldPrint=print
-function print(...)
-    PrintHelper:AddString(...)
-    OldPrint(...)
-end
-
-function printf(...)
-    return print(string.format(...))
 end
 
 ----------------------------
