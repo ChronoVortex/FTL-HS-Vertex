@@ -55,7 +55,11 @@ do
 end
 
 -- Apply map icons
-script.on_init(function()
+local setMapIcon = false
+script.on_init(function() setMapIcon = true end)
+script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
+    if not (setMapIcon and Hyperspace.ships.player) then return end
+    setMapIcon = false
     local starMap = Hyperspace.Global.GetInstance():GetCApp().world.starMap
     local playerShipName = Hyperspace.ships.player.myBlueprint.blueprintName
     for iconShipName, icons in pairs(mapIcons) do
