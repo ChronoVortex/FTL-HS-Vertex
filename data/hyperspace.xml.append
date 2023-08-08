@@ -2,7 +2,7 @@
 
 <FTL>
 
-<mod:findLike type="scripts">
+<mod:findLike type="scripts" limit="1">
     <mod-append:script>data/vertex_module/util.lua</mod-append:script>
     <mod-append:script>data/vertex_module/xmlDataInit.lua</mod-append:script>
     
@@ -18,6 +18,8 @@
     <mod-append:script>data/vertex_module/tags/stealth.lua</mod-append:script>
     
     <mod-append:script>data/vertex_module/xmlDataRead.lua</mod-append:script>
+    
+    <mod-append:script>data/vertex_module/misc/shipBlueprints.lua</mod-append:script>
 </mod:findLike>
 
 </FTL>
