@@ -7,7 +7,9 @@ local function node_get_number_default(node, default)
 end
 local function map_ship_primitive(dir, xPos, yPos)
     local tex = Hyperspace.Resources:GetImageId(dir)
-    return Hyperspace.Resources:CreateImagePrimitive(tex, xPos or -10, yPos or -tex.height/2, 0, Graphics.GL_Color(1, 1, 1, 1), 1, false)
+    local ret = Hyperspace.Resources:CreateImagePrimitive(tex, xPos or -10, yPos or -tex.height/2, 0, Graphics.GL_Color(1, 1, 1, 1), 1, false)
+    ret.textureAntialias = true
+    return ret
 end
 
 -- Map icons setup
