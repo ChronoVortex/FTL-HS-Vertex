@@ -73,7 +73,11 @@ local function logic()
         for system in vter(ship.vSystemList) do
             local sysHackData = userdata_table(system, "mods.vertex.hack")
             if sysHackData.time and sysHackData.time > 0 then
-                sysHackData.time = math.max(sysHackData.time - Hyperspace.FPS.SpeedFactor/16, 0)
+                if ship.bDestroyed then
+                    sysHackData.time = 0
+                else
+                    sysHackData.time = math.max(sysHackData.time - Hyperspace.FPS.SpeedFactor/16, 0)
+                end
                 if sysHackData.time == 0 then
                     system.iHackEffect = 0
                     system.bUnderAttack = false
