@@ -1,7 +1,3 @@
-if not (Hyperspace.version and Hyperspace.version.major == 1 and Hyperspace.version.minor >= 6) then
-    error("Incorrect Hyperspace version detected! Vertex Tags and Utility Functions requires Hyperspace 1.6+")
-end
-
 mods.vertexutil = {}
 local INT_MAX = 2147483647
 
