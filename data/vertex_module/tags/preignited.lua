@@ -30,23 +30,15 @@ end
 -- LOGIC --
 -----------
 local function logic()
-    local wasJumping = false
-    script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
-        local isJumping = false
-        if pcall(function() isJumping = Hyperspace.ships.player.bJumping end) then
-            if not isJumping and wasJumping then
-                local weapons = nil
-                pcall(function() weapons = Hyperspace.ships.player.weaponSystem.weapons end)
-                if weapons then
-                    for weapon in vter(weapons) do
-                        local preignited = weaponInfo[weapon.blueprint.name]["preignited"]
-                        if preignited and preignited.doPreignite and weapon.powered and weapon.cooldown.first < weapon.cooldown.second then
-                            weapon:ForceCoolup()
-                        end
-                    end
+    script.on_internal_event(Defines.InternalEvents.JUMP_ARRIVE, function(ship)
+        local weapons = nil
+        if pcall(function() weapons = ship.weaponSystem.weapons end) and weapons then
+            for weapon in vter(weapons) do
+                local preignited = weaponInfo[weapon.blueprint.name]["preignited"]
+                if preignited and preignited.doPreignite and weapon.powered and weapon.cooldown.first < weapon.cooldown.second then
+                    weapon:ForceCoolup()
                 end
             end
-            wasJumping = isJumping
         end
     end)
 end
