@@ -58,8 +58,14 @@ end
 
 -- Apply map icons
 local setMapIcon = false
-script.on_init(function() setMapIcon = true end)
-script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
+script.on_init(function() setMapIcon = true end) -- Handle icon on game start
+script.on_internal_event(Defines.InternalEvents.ON_TICK, function() -- Reset icon
+    if not (setMapIcon and Hyperspace.ships.player) then return end
+    local starMap = Hyperspace.Global.GetInstance():GetCApp().world.starMap
+    starMap.ship = mapIconBase
+    starMap.shipNoFuel = mapIconBaseFuel
+end, 100)
+script.on_internal_event(Defines.InternalEvents.ON_TICK, function() -- Set custom icon
     if not (setMapIcon and Hyperspace.ships.player) then return end
     setMapIcon = false
     local starMap = Hyperspace.Global.GetInstance():GetCApp().world.starMap
@@ -71,6 +77,4 @@ script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
             return
         end
     end
-    starMap.ship = mapIconBase
-    starMap.shipNoFuel = mapIconBaseFuel
 end)
