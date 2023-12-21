@@ -50,7 +50,7 @@ local function parser(node)
         hack.systemDurations[systemDuration:name()] = sysDurations
         
         if not systemDuration:value() then error("hack nested system tag "..tostring(systemDuration:name()).." requires a duration!") end
-        sysDurations.duration = tonumber(node:first_attribute("duration"):value())
+        sysDurations.duration = tonumber(systemDuration:value() or node:first_attribute("duration"):value())
         if not sysDurations.duration then error("Invalid number for hack nested system tag "..tostring(systemDuration:name()).."!") end
         
         if systemDuration:first_attribute("immuneAfterHack") then
