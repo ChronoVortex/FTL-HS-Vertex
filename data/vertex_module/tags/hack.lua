@@ -93,7 +93,7 @@ local function logic()
         if system then
             local sysHackData = userdata_table(system, "mods.vertex.hack")
             if not sysHackData.immuneTime or sysHackData.immuneTime <= 0 then
-                local sysDuration = hack.systemDurations[Hyperspace.ShipSystem.SystemIdToName(system:GetId())]
+                local sysDuration = hack.systemDurations and hack.systemDurations[Hyperspace.ShipSystem.SystemIdToName(system:GetId())]
                 
                 -- Set hacking time for system
                 if sysDuration then
@@ -134,9 +134,10 @@ local function logic()
         local hack = nil
         pcall(function() hack = weaponInfo[projectile.extend.name]["hack"] end)
         if hack and hack.hitShieldDuration and hack.hitShieldDuration > 0 then
-            local shieldDuration = {}
-            shieldDuration["shields"] = hack.hitShieldDuration
-            apply_hack({systemDurations = shieldDuration}, shipManager:GetSystem(0))
+            apply_hack({
+                duration = hack.hitShieldDuration,
+                immuneAfterHack = hack.systemDurations.shields and hack.systemDurations.shields.immuneAfterHack or hack.immuneAfterHack
+            }, shipManager:GetSystem(0))
         end
     end)
 end
