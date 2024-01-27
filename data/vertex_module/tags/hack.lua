@@ -25,6 +25,7 @@ local userdata_table = mods.vertexutil.userdata_table
 ------------
 local function parser(node)
     local hack = {}
+    hack.boostHackingTimeAddition = 0
     
     if not node:first_attribute("duration") then error("hack tag requires a duration!") end
     hack.duration = tonumber(node:first_attribute("duration"):value())
@@ -43,6 +44,14 @@ local function parser(node)
             error("Invalid number for hack 'hitShieldDuration' attribute!")
         end
     end
+
+    -- Used for dictating how much the hacking time is boosted by stack of boost
+    if node:first_attribute("boostHackingTimeAddition") then
+        hack.boostHackingTimeAddition = tonumber(node:first_attribute("boostHackingTimeAddition"):value())
+        if not hack.boostHackingTimeAddition then
+            error("Invalid number for hack 'boostHackingTimeAddition' attribute!")
+        end
+    end
     
     hack.systemDurations = {}
     for systemDuration in Children(node) do
@@ -57,6 +66,13 @@ local function parser(node)
             sysDurations.immuneAfterHack = tonumber(systemDuration:first_attribute("immuneAfterHack"):value())
             if not sysDurations.immuneAfterHack then
                 error("Invalid number for hack nested system tag "..tostring(systemDuration:name()).." 'immuneAfterHack' attribute!")
+            end
+        end
+
+        if systemDuration:first_attribute("boostHackingTimeAddition") then
+            sysDurations.boostHackingTimeAddition = tonumber(systemDuration:first_attribute("boostHackingTimeAddition"):value())
+            if not sysDurations.boostHackingTimeAddition then
+                error("Invalid number for hack nested system tag "..tostring(systemDuration:name()).." 'boostHackingTimeAddition' attribute!")
             end
         end
     end
@@ -89,18 +105,23 @@ local function logic()
     end)
 
     -- General function for applying hack to a system on hit
-    local function apply_hack(hack, system)
+    local function apply_hack(hack, system, weapon)
         if system then
             local sysHackData = userdata_table(system, "mods.vertex.hack")
+            local weaponBoost = weapon and weapon.blueprint.boostPower
+
             if not sysHackData.immuneTime or sysHackData.immuneTime <= 0 then
-                local sysDuration = hack.systemDurations and hack.systemDurations[Hyperspace.ShipSystem.SystemIdToName(system:GetId())]
+                local sysDuration = hack.systemDurations[Hyperspace.ShipSystem.SystemIdToName(system:GetId())]
+
+                -- Aquire the adaptive time for the system
+                local adaptiveTime = weaponBoost and weaponBoost.type == 1 and ((sysDuration and sysDuration.boostHackingTimeAddition or hack.boostHackingTimeAddition) * math.min(weaponBoost.count, weapon.boostLevel - 1)) or 0
                 
                 -- Set hacking time for system
                 if sysDuration then
-                    sysHackData.time = math.max(sysDuration.duration, sysHackData.time or 0)
+                    sysHackData.time = math.max(sysDuration.duration + adaptiveTime, sysHackData.time and (sysHackData.time + adaptiveTime) or 0)
                     sysHackData.immuneTime = math.max(sysDuration.immuneAfterHack or hack.immuneAfterHack or 0, sysHackData.immuneTime or 0)
                 else
-                    sysHackData.time = math.max(hack.duration, sysHackData.time or 0)
+                    sysHackData.time = math.max(hack.duration + adaptiveTime, sysHackData.time and (sysHackData.time + adaptiveTime) or 0)
                     sysHackData.immuneTime = math.max(hack.immuneAfterHack or 0, sysHackData.immuneTime or 0)
                 end
                 
@@ -111,11 +132,26 @@ local function logic()
         end
     end
 
+    -- Acquire the weapon that was the most recently fired
+    local function find_weaponFactory_recentlyFired(ship, weaponName)
+        local weapons = ship:GetWeaponList()
+        local time = 10
+        local output = nil
+        for i = 0, weapons:size() - 1 do
+            local weapon = weapons[i]
+            if weapon.blueprint.name == weaponName and weapon.powered and weapon.cooldown.first < time then
+                time = weapon.cooldown.first
+                output = weapon
+            end
+        end
+        return output
+    end
+
     -- Handle hacking beams
     script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManager, projectile, location, damage, realNewTile, beamHitType)
         hack = weaponInfo[projectile.extend.name]["hack"]
         if hack and hack.duration and hack.duration > 0 and beamHitType == Defines.BeamHit.NEW_ROOM then
-            apply_hack(hack, shipManager:GetSystemInRoom(get_room_at_location(shipManager, location, true)))
+            apply_hack(hack, shipManager:GetSystemInRoom(get_room_at_location(shipManager, location, true)), false)
         end
         return Defines.Chain.CONTINUE, beamHitType
     end)
@@ -125,7 +161,12 @@ local function logic()
         local hack = nil
         pcall(function() hack = weaponInfo[projectile.extend.name]["hack"] end)
         if hack and hack.duration and hack.duration > 0 then
-            apply_hack(hack, shipManager:GetSystemInRoom(get_room_at_location(shipManager, location, true)))
+            local opponent = Hyperspace.ships.player
+            if shipManager.iShipId == Hyperspace.ships.player.iShipId then opponent = Hyperspace.ships.enemy end
+            if not projectile.extend then return end
+
+            local weapon = find_weaponFactory_recentlyFired(opponent, projectile.extend.name)
+            apply_hack(hack, shipManager:GetSystemInRoom(get_room_at_location(shipManager, location, true)), weapon)
         end
     end)
 
@@ -134,10 +175,9 @@ local function logic()
         local hack = nil
         pcall(function() hack = weaponInfo[projectile.extend.name]["hack"] end)
         if hack and hack.hitShieldDuration and hack.hitShieldDuration > 0 then
-            apply_hack({
-                duration = hack.hitShieldDuration,
-                immuneAfterHack = hack.systemDurations.shields and hack.systemDurations.shields.immuneAfterHack or hack.immuneAfterHack
-            }, shipManager:GetSystem(0))
+            local shieldDuration = {}
+            shieldDuration["shields"] = hack.hitShieldDuration
+            apply_hack({systemDurations = shieldDuration}, shipManager:GetSystem(0), false)
         end
     end)
 end
