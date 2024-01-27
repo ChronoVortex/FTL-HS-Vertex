@@ -133,7 +133,7 @@ local function logic()
     -- Track boost of weapons that fire hacking projectiles
     script.on_internal_event(Defines.InternalEvents.PROJECTILE_FIRE, function(projectile, weapon)
         if weaponInfo[weapon.blueprint.name]["hack"] and weapon.blueprint.boostPower and weapon.blueprint.boostPower.type == 1 then
-            userdata_table(projectile, "mods.vertex.hack").boost = weapon.boostLevel
+            userdata_table(projectile, "mods.vertex.hack").boost = weapon.boostLevel - 1
         end
     end)
 
