@@ -25,7 +25,6 @@ local userdata_table = mods.vertexutil.userdata_table
 ------------
 local function parser(node)
     local hack = {}
-    hack.boostHackingTimeAddition = 0
     
     if not node:first_attribute("duration") then error("hack tag requires a duration!") end
     hack.duration = tonumber(node:first_attribute("duration"):value())
@@ -46,6 +45,7 @@ local function parser(node)
     end
 
     -- Used for dictating how much the hacking time is boosted by stack of boost
+    hack.boostHackingTimeAddition = 0
     if node:first_attribute("boostHackingTimeAddition") then
         hack.boostHackingTimeAddition = tonumber(node:first_attribute("boostHackingTimeAddition"):value())
         if not hack.boostHackingTimeAddition then
