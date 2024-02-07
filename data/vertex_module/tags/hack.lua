@@ -107,7 +107,6 @@ local function logic()
 
     -- General function for applying hack to a system on hit
     local function apply_hack(hack, system, boost)
-        print(boost)
         if system then
             local sysHackData = userdata_table(system, "mods.vertex.hack")
             if not sysHackData.immuneTime or sysHackData.immuneTime <= 0 then
