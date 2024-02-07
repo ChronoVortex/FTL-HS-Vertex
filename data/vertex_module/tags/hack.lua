@@ -19,6 +19,7 @@ local get_ship_crew_point = mods.vertexutil.get_ship_crew_point
 local get_adjacent_rooms = mods.vertexutil.get_adjacent_rooms
 local get_room_at_location = mods.vertexutil.get_room_at_location
 local userdata_table = mods.vertexutil.userdata_table
+local is_first_shot = mods.vertexutil.is_first_shot
 
 ------------
 -- PARSER --
@@ -106,6 +107,7 @@ local function logic()
 
     -- General function for applying hack to a system on hit
     local function apply_hack(hack, system, boost)
+        print(boost)
         if system then
             local sysHackData = userdata_table(system, "mods.vertex.hack")
             if not sysHackData.immuneTime or sysHackData.immuneTime <= 0 then
@@ -132,8 +134,17 @@ local function logic()
 
     -- Track boost of weapons that fire hacking projectiles
     script.on_internal_event(Defines.InternalEvents.PROJECTILE_FIRE, function(projectile, weapon)
-        if weaponInfo[weapon.blueprint.name]["hack"] and weapon.blueprint.boostPower and weapon.blueprint.boostPower.type == 1 then
-            userdata_table(projectile, "mods.vertex.hack").boost = weapon.boostLevel - 1
+        if weaponInfo[weapon.blueprint.name]["hack"] and weapon.blueprint.boostPower then
+            local weapHackData = userdata_table(weapon, "mods.vertex.hack")
+            if is_first_shot(weapon, true) then
+                if (weapHackData.lastBoost and weapHackData.lastBoost == weapon.boostLevel and weapon.blueprint.boostPower.count == weapon.boostLevel) then
+                    weapHackData.boost = weapon.boostLevel
+                else
+                    weapHackData.boost = weapon.boostLevel - 1
+                end
+                weapHackData.lastBoost = weapon.boostLevel
+            end
+            userdata_table(projectile, "mods.vertex.hack").boost = weapHackData.boost
         end
     end)
 
