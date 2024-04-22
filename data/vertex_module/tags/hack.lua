@@ -149,7 +149,7 @@ local function logic()
 
     -- Handle hacking beams
     script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManager, projectile, location, damage, realNewTile, beamHitType)
-        hack = weaponInfo[projectile.extend.name]["hack"]
+        local hack = weaponInfo[projectile.extend.name]["hack"]
         if hack and hack.duration and hack.duration > 0 and beamHitType == Defines.BeamHit.NEW_ROOM then
             apply_hack(hack, shipManager:GetSystemInRoom(get_room_at_location(shipManager, location, true)), userdata_table(projectile, "mods.vertex.hack").boost)
         end
