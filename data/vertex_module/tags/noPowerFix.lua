@@ -36,7 +36,7 @@ local function logic()
             if noPowerFix and noPowerFix.doFix then
                 local projectile = weapon:GetProjectile()
                 while projectile do
-                    Hyperspace.Global.GetInstance():GetCApp().world.space.projectiles:push_back(projectile)
+                    Hyperspace.App.world.space.projectiles:push_back(projectile)
                     projectile = weapon:GetProjectile()
                 end
             end

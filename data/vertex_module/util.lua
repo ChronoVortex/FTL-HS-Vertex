@@ -1,5 +1,4 @@
 mods.vertexutil = {}
-local INT_MAX = 2147483647
 
 ----------------------------
 -- MISC UTILITY FUNCTIONS --
@@ -81,7 +80,7 @@ end
 function mods.vertexutil.under_mind_system(crewmem)
     local controlledCrew = nil
     local otherShipId = (crewmem.iShipId + 1)%2
-    pcall(function() controlledCrew = Hyperspace.Global.GetInstance():GetShipManager(otherShipId).mindSystem.controlledCrew end)
+    pcall(function() controlledCrew = Hyperspace.ships(otherShipId).mindSystem.controlledCrew end)
     if controlledCrew then
         for crew in vter(controlledCrew) do
             if crewmem == crew then
@@ -171,8 +170,8 @@ end
 
 -- Generate a random point within the radius of a given point
 function mods.vertexutil.random_point_radius(origin, radius)
-    local r = radius*math.sqrt(Hyperspace.random32()/INT_MAX)
-    local theta = 2*math.pi*(Hyperspace.random32()/INT_MAX)
+    local r = radius*math.sqrt(math.random())
+    local theta = 2*math.pi*(math.random())
     return Hyperspace.Pointf(origin.x + r*math.cos(theta), origin.y + r*math.sin(theta))
 end
 

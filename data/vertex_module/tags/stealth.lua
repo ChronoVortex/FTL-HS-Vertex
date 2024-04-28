@@ -34,7 +34,7 @@ local function logic()
     script.on_internal_event(Defines.InternalEvents.PROJECTILE_FIRE, function(projectile, weapon)
         local stealth = weaponInfo[weapon.blueprint.name]["stealth"]
         if stealth and stealth.doStealth then
-            local ship = Hyperspace.Global.GetInstance():GetShipManager(weapon.iShipId)
+            local ship = Hyperspace.ships(weapon.iShipId)
             if ship.cloakSystem and ship.cloakSystem.bTurnedOn and ship:HasAugmentation("CLOAK_FIRE") == 0 and is_first_shot(weapon, true) then
                 local timer = ship.cloakSystem.timer
                 timer.currTime = timer.currTime - timer.currGoal/5

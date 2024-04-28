@@ -61,14 +61,14 @@ local setMapIcon = false
 script.on_init(function() setMapIcon = true end) -- Handle icon on game start
 script.on_internal_event(Defines.InternalEvents.ON_TICK, function() -- Reset icon
     if not (setMapIcon and Hyperspace.ships.player) then return end
-    local starMap = Hyperspace.Global.GetInstance():GetCApp().world.starMap
+    local starMap = Hyperspace.App.world.starMap
     starMap.ship = mapIconBase
     starMap.shipNoFuel = mapIconBaseFuel
 end, 100)
 script.on_internal_event(Defines.InternalEvents.ON_TICK, function() -- Set custom icon
     if not (setMapIcon and Hyperspace.ships.player) then return end
     setMapIcon = false
-    local starMap = Hyperspace.Global.GetInstance():GetCApp().world.starMap
+    local starMap = Hyperspace.App.world.starMap
     local playerShipName = Hyperspace.ships.player.myBlueprint.blueprintName
     for iconShipName, icons in pairs(mapIcons) do
         if playerShipName == iconShipName then
