@@ -131,10 +131,14 @@ function particles:Create(typeName, x, y, space, layer, rotate, mirror)
 end
 
 function particles:Update()
-    for index, particle in ipairs(self) do
+    local particleCount = #self
+    local index = 1
+    while index <= particleCount do
+        local particle = self[index]
         particle.lifeRemaining = particle.lifeRemaining - seconds_per_tick()
         if particle.lifeRemaining <= 0 then
             table.remove(self, index)
+            particleCount = particleCount - 1
         else
             local lifeProgress = 1 - particle.lifeRemaining/particle.lifetime
             if particle.type.anim.animated then
@@ -163,6 +167,7 @@ function particles:Update()
             particle.direction = particle.direction + particle.type.direction.increment*particle.angleSign*seconds_per_tick()
             particle.orientation = particle.orientation + particle.type.orientation.increment*particle.angleSign*seconds_per_tick()
             particle.scale = particle.scale + particle.type.scale.increment*seconds_per_tick()
+            index = index + 1
         end
     end
 end
