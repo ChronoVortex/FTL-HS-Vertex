@@ -85,6 +85,15 @@ end
 -- LOGIC --
 -----------
 local function logic()
+    local function hack_start(system)
+        system:SetHackingLevel(2)
+        system.bUnderAttack = true
+    end
+    local function hack_end(system)
+        system:SetHackingLevel(0)
+        system.bUnderAttack = false
+    end
+    
     -- Track hack time for systems hacked by a weapon
     script.on_internal_event(Defines.InternalEvents.SHIP_LOOP, function(ship)
         for system in vter(ship.vSystemList) do
@@ -96,8 +105,7 @@ local function logic()
                     sysHackData.time = math.max(sysHackData.time - Hyperspace.FPS.SpeedFactor/16, 0)
                 end
                 if sysHackData.time == 0 then
-                    system.iHackEffect = 0
-                    system.bUnderAttack = false
+                    hack_end(system)
                 end
             elseif sysHackData.immuneTime and sysHackData.immuneTime > 0 then
                 sysHackData.immuneTime = math.max(sysHackData.immuneTime - Hyperspace.FPS.SpeedFactor/16, 0)
@@ -125,8 +133,7 @@ local function logic()
                 end
                 
                 -- Apply the actual hack effect
-                system.iHackEffect = 2
-                system.bUnderAttack = true
+                hack_start(system)
             end
         end
     end
