@@ -113,7 +113,7 @@ end
 
 -- Returns a table of all crew belonging to the given ship on the room tile at the given point
 function mods.vertexutil.get_ship_crew_point(shipManager, x, y, maxCount)
-    res = {}
+    local res = {}
     x = x//35
     y = y//35
     for crewmem in vter(shipManager.vCrewList) do
