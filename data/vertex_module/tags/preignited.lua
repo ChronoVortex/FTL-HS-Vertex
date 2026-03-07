@@ -30,17 +30,18 @@ end
 -- LOGIC --
 -----------
 local function logic()
-    script.on_internal_event(Defines.InternalEvents.JUMP_ARRIVE, function(ship)
-        local weapons = nil
-        if pcall(function() weapons = ship.weaponSystem.weapons end) and weapons then
-            for weapon in vter(weapons) do
+	local function preignite_on_jump(ship)
+        if ship and ship.weaponSystem and ship.weaponSystem.weapons then
+            for weapon in vter(ship.weaponSystem.weapons) do
                 local preignited = weaponInfo[weapon.blueprint.name]["preignited"]
                 if preignited and preignited.doPreignite and weapon.powered and weapon.cooldown.first < weapon.cooldown.second then
                     weapon:ForceCoolup()
                 end
             end
         end
-    end)
+	end
+    script.on_internal_event(Defines.InternalEvents.JUMP_ARRIVE, preignite_on_jump)
+    script.on_internal_event(Defines.InternalEvents.ON_WAIT, preignite_on_jump)
 end
 
 tag_add_weapons("preignited", parser, logic)
