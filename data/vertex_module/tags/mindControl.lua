@@ -68,7 +68,7 @@ local function logic()
                 if mcTable.mcTime == 0 then
                     crewmem:SetMindControl(false)
                     if mcTable.mcEndSound then
-                        Hyperspace.Global.GetInstance():GetSoundControl():PlaySoundMix(mcTable.mcEndSound, 1, false)
+                        Hyperspace.Sounds:PlaySoundMix(mcTable.mcEndSound, -1, false)
                     end
                     mcTable.mcTime = nil
                     mcTable.mcEndSound = nil
@@ -79,7 +79,7 @@ local function logic()
 
     -- Handle mind control beams
     script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManager, projectile, location, damage, realNewTile, beamHitType)
-        local mindControl = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["mindControl"]
+        local mindControl = weaponInfo[projectile.extend.name]["mindControl"]
         if mindControl and mindControl.duration then -- Doesn't check realNewTile anymore 'cause the beam kept missing crew that were on the move
             for i, crewmem in ipairs(get_ship_crew_point(shipManager, location.x, location.y)) do
                 if can_be_mind_controlled(crewmem) then
@@ -98,7 +98,7 @@ local function logic()
     -- Handle other mind control weapons
     script.on_internal_event(Defines.InternalEvents.DAMAGE_AREA_HIT, function(shipManager, projectile, location, damage, shipFriendlyFire)
         local mindControl = nil
-        pcall(function() mindControl = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["mindControl"] end)
+        pcall(function() mindControl = weaponInfo[projectile.extend.name]["mindControl"] end)
         if mindControl and mindControl.duration then
             local roomId = get_room_at_location(shipManager, location, true)
             local mindControlledCrew = 0

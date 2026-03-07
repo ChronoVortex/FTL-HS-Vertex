@@ -2,7 +2,7 @@
 
 <FTL>
 
-<version>^1.8.0</version>
+<version>^1.13.0</version>
 
 <mod:findLike type="scripts" limit="1">
     <mod-append:script>data/vertex_module/util.lua</mod-append:script>

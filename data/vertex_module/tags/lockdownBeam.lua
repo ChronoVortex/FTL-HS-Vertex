@@ -52,16 +52,16 @@ end
 -----------
 local function logic()
     script.on_internal_event(Defines.InternalEvents.DAMAGE_BEAM, function(shipManager, projectile, location, damage, realNewTile, beamHitType)
-        local lockdown = weaponInfo[Hyperspace.Get_Projectile_Extend(projectile).name]["lockdownBeam"]
+        local lockdown = weaponInfo[projectile.extend.name]["lockdownBeam"]
         if lockdown.doLockdown then
             local doLockdown = 
                 not lockdown.chance or
                 lockdown.chance >= 10 or
-                (lockdown.chance > 0 and lockdown.chance > Hyperspace.random32()%10)
+                (lockdown.chance > 0 and lockdown.chance > math.random(10) - 1)
             if doLockdown and beamHitType == Defines.BeamHit.NEW_ROOM then
                 shipManager.ship:LockdownRoom(get_room_at_location(shipManager, location, true), location)
                 if #(lockdown.sounds) > 0 then
-                    Hyperspace.Global.GetInstance():GetSoundControl():PlaySoundMix(lockdown.sounds[Hyperspace.random32()%#(lockdown.sounds) + 1], 1, false)
+                    Hyperspace.Sounds:PlaySoundMix(lockdown.sounds[math.random(#(lockdown.sounds))], -1, false)
                 end
             end
         end

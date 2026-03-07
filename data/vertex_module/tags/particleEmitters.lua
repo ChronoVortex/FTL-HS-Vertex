@@ -45,7 +45,7 @@ local function logic()
         particles:Render(ship.iShipId, particleLayers.TOP)
     end)
     script.on_internal_event(Defines.InternalEvents.ON_TICK, function()
-        if not Hyperspace.Global.GetInstance():GetCApp().world.space.gamePaused then
+        if not Hyperspace.App.world.space.gamePaused then
             particles:Update()
         end
     end)

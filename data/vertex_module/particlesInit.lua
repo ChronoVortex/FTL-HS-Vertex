@@ -3,7 +3,6 @@ mods.vertexparts = {}
 local vter = mods.vertexutil.vter
 local Children = mods.vertexdata.Children
 local parse_xml_bool = mods.vertexdata.parse_xml_bool
-local INT_MAX = 2147483647
 
 ----------------------
 -- HELPER FUNCTIONS --
@@ -13,7 +12,7 @@ local function seconds_per_tick()
 end
 
 local function rand_range(min, max)
-    return (Hyperspace.random32()/INT_MAX)*(max - min) + min
+    return math.random()*(max - min) + min
 end
 
 local function lerp(a, b, amount)
@@ -87,11 +86,11 @@ function particles:Create(typeName, x, y, space, layer, rotate, mirror)
     particle.layer = layer
     particle.rotate = rotate
     particle.mirror = mirror
-    particle.anim = Hyperspace.Global.GetInstance():GetAnimationControl():GetAnimation(particle.type.anim.name)
+    particle.anim = Hyperspace.Animations:GetAnimation(particle.type.anim.name)
     particle.anim.position.x = -particle.anim.info.frameWidth/2
     particle.anim.position.y = -particle.anim.info.frameHeight/2
     if particle.type.anim.random then
-        particle.anim:SetCurrentFrame(Hyperspace.random32()%particle.anim.info.numFrames)
+        particle.anim:SetCurrentFrame(math.random(particle.anim.info.numFrames) - 1)
     end
     if particle.type.anim.animated then
         particle.anim.tracker.loop = true
@@ -132,10 +131,14 @@ function particles:Create(typeName, x, y, space, layer, rotate, mirror)
 end
 
 function particles:Update()
-    for index, particle in ipairs(self) do
+    local particleCount = #self
+    local index = 1
+    while index <= particleCount do
+        local particle = self[index]
         particle.lifeRemaining = particle.lifeRemaining - seconds_per_tick()
         if particle.lifeRemaining <= 0 then
             table.remove(self, index)
+            particleCount = particleCount - 1
         else
             local lifeProgress = 1 - particle.lifeRemaining/particle.lifetime
             if particle.type.anim.animated then
@@ -164,6 +167,7 @@ function particles:Update()
             particle.direction = particle.direction + particle.type.direction.increment*particle.angleSign*seconds_per_tick()
             particle.orientation = particle.orientation + particle.type.orientation.increment*particle.angleSign*seconds_per_tick()
             particle.scale = particle.scale + particle.type.scale.increment*seconds_per_tick()
+            index = index + 1
         end
     end
 end
@@ -387,7 +391,7 @@ end
 local function generate_shape_offset(emitter)
     local offsetX, offsetY
     if emitter.shape == emitterShapes.LINE then
-        local offsetMagnitude = Hyperspace.random32()/INT_MAX
+        local offsetMagnitude = math.random()
         offsetX = offsetMagnitude*emitter.width
         offsetY = offsetMagnitude*emitter.height
     elseif emitter.shape == emitterShapes.RECT then
@@ -403,8 +407,8 @@ local function generate_shape_offset(emitter)
         end
     elseif emitter.shape == emitterShapes.ELLIPSE then
         local halfWidth = emitter.width/2
-        local r = halfWidth*math.sqrt(Hyperspace.random32()/INT_MAX)
-        local theta = 2*math.pi*(Hyperspace.random32()/INT_MAX)
+        local r = halfWidth*math.sqrt(math.random())
+        local theta = 2*math.pi*(math.random())
         offsetX = halfWidth + r*math.cos(theta)
         offsetY = (halfWidth + r*math.sin(theta))*(emitter.height/emitter.width)
     end
@@ -425,7 +429,7 @@ function particleEmitters:Emit(emitter, event, weapon, posX, posY, shipId)
             
             -- Calculate weapon coodinates
             local weaponAnim = weapon.weaponVisual
-            local ship = Hyperspace.Global.GetInstance():GetShipManager(weapon.iShipId).ship
+            local ship = Hyperspace.ships(weapon.iShipId).ship
             local shipGraph = Hyperspace.ShipGraph.GetShipInfo(weapon.iShipId)
             local slideOffset = weaponAnim:GetSlide()
             emitPointX = emitPointX + ship.shipImage.x + shipGraph.shipBox.x + weaponAnim.renderPoint.x + slideOffset.x
